@@ -56,7 +56,7 @@ const AddExpense = (props) => {
 			});
 	};
 
-	const onCloseHandler = () => setShow(false);
+	const onCloseHandler = () => props.onModalClose();
 
 	return (
 		<Modal show={show} onHide={onCloseHandler}>
@@ -136,7 +136,7 @@ const AddExpense = (props) => {
 			</Modal.Body>
 
 			<Modal.Footer>
-				<Button variant="secondary">Close</Button>
+				<Button variant="secondary" onClick={onCloseHandler}>Close</Button>
 				<Button variant="primary" onClick={addExpenseHandler}>
 					Save Expense
 				</Button>

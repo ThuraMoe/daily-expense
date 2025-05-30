@@ -9,11 +9,12 @@ function App() {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const openExpenseModal = () => setIsOpen(true);
+	const closeExpenseModal = () => setIsOpen(false);
 
 	return (
 		<>
 			<Container>
-				<AddExpense onModalOpen={isOpen} />
+				<AddExpense onModalOpen={isOpen} onModalClose={closeExpenseModal} />
 				<br />
 				<ListExpense onNewExpense={openExpenseModal} />
 			</Container>
