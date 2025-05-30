@@ -4,13 +4,16 @@ import { getDatabase, ref, get, remove } from "firebase/database";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
+import { Button } from "react-bootstrap";
 
-const ListExpense = () => {
+const ListExpense = (props) => {
 	let [expenses, setExpenses] = useState([]);
 
 	useEffect(() => {
 		getExpenses();
 	}, []);
+
+	const addNewExpenseHandler = () => props.onNewExpense();
 
 	const getExpenses = async () => {
 		const db = getDatabase(app);
@@ -39,40 +42,49 @@ const ListExpense = () => {
 	};
 
 	return (
-		<Row>
-			<Col xs={12}>
-				<h3>List of Expenses</h3>
-				<Table striped bordered hover>
-					<thead>
-						<tr>
-							<th>Title</th>
-							<th>Amount</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{expenses.map((expense) => {
-							return (
-								<tr key={expense.key}>
-									<td>{expense.name}</td>
-									<td>{expense.amount}</td>
-									<td>
-										<button>Edit</button>
-										<button
-											onClick={() =>
-												deleteHandler(expense.key)
-											}
-										>
-											Delete
-										</button>
-									</td>
-								</tr>
-							);
-						})}
-					</tbody>
-				</Table>
-			</Col>
-		</Row>
+		<>
+			<Row>
+				<Col xs={10}>
+					<h3>List of Expenses</h3>
+				</Col>
+				<Col xs={2}>
+					<Button onClick={addNewExpenseHandler}>Add New Expense</Button>
+				</Col>
+			</Row>
+			<Row>
+				<Col xs={12}>
+					<Table striped bordered hover>
+						<thead>
+							<tr>
+								<th>Title</th>
+								<th>Amount</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							{expenses.map((expense) => {
+								return (
+									<tr key={expense.key}>
+										<td>{expense.name}</td>
+										<td>{expense.amount}</td>
+										<td>
+											<button>Edit</button>
+											<button
+												onClick={() =>
+													deleteHandler(expense.key)
+												}
+											>
+												Delete
+											</button>
+										</td>
+									</tr>
+								);
+							})}
+						</tbody>
+					</Table>
+				</Col>
+			</Row>
+		</>
 	);
 };
 
