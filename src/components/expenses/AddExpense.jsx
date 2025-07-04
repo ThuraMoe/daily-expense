@@ -29,7 +29,6 @@ const AddExpense = (props) => {
 	);
 	const [isSave, setIsSave] = useState(false);
 	const [show, setShow] = useState(false);
-	console.log(props.onModalOpen);
 
 	useEffect(() => {setShow(props.onModalOpen)},[props.onModalOpen])
 
@@ -49,6 +48,8 @@ const AddExpense = (props) => {
 				setExpenseAmount("");
 				setExpenseName("");
 				setIsSave(true);
+				// state lifting to parents
+				props.onModalSave();
 			})
 			.catch((error) => {
 				console.error("Error writing document: ", error);
