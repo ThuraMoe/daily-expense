@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import app from "../../firebaseConfig";
+import categoryList from "./Category";
 import { getDatabase, ref, set, push } from "firebase/database";
 import {
 	Row,
@@ -13,13 +14,7 @@ import {
 import dayjs from "dayjs";
 
 const AddExpense = (props) => {
-	const categoryList = [
-		"Food",
-		"Transportation",
-		"Healthcare",
-		"Family & Friends",
-		"Trip",
-	];
+	
 	const [category, setCategory] = useState("Food");
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
@@ -119,7 +114,7 @@ const AddExpense = (props) => {
 								}}
 							>
 								<option value="usd">USD</option>
-								<option value="riel">Riel</option>
+								<option value="khr">Riel</option>
 								<option value="mmk">MMK</option>
 							</Form.Select>
 						</InputGroup>

@@ -1,0 +1,8 @@
+.category {
+    display: inline-block;
+    border: 1px solid #1c1c11;
+    border-radius: -100%;
+    margin: 5px;
+    padding: 5px;
+    box-shadow: 0px 2px 4px 0px #ccc;
+}
