@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import app from "../../firebaseConfig";
-import { getDatabase, ref, get, remove, query, orderByChild, equalTo } from "firebase/database";
+import { getDatabase, ref, get, remove, query, orderByChild, equalTo, update } from "firebase/database";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
@@ -25,6 +25,7 @@ const ListExpense = (props) => {
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
 	const [currency, setCurrency] = useState("usd");
+	const [expenseKey, setExpenseKey] = useState(null);
 
 	useEffect(() => {
 		getExpenses();
@@ -131,6 +132,7 @@ const ListExpense = (props) => {
 	}
 
 	const editExpenseHandler = (expense) => {
+		const key = expense.key;
 		const defaultCategory = expense.category;
 		const expName = expense.name;
 		const amount = expense.amount;
@@ -140,14 +142,35 @@ const ListExpense = (props) => {
 		setIsEdit(true);
 
 		// set original value
+		setExpenseKey(key);
 		setCategory(defaultCategory);
 		setExpenseName(expName);
 		setExpenseAmount(amount);
 		setCurrency(currency);
-
 	}
 
-	const updateExpenseHandler = () => {};
+	const updateExpenseHandler = async () => {
+		
+		const db = getDatabase(app);
+		const updateExpenseRef =  ref(db, `expenses/daily-expenses/${expenseDate}/${expenseKey}`);
+
+		// updated data
+		const updatedData = {
+			name: expenseName,
+			category: category,
+			amount: expenseAmount,
+			currency: currency
+		};
+
+		// update data
+		await update(updateExpenseRef, updatedData);
+
+		// close editable box
+		setIsEdit(false);
+
+		// call expense data again
+		getExpenses();
+	};
 
 	const cancelEditHandler = () => {
 		setIsEdit(false);
@@ -181,7 +204,7 @@ const ListExpense = (props) => {
 			</Row>
 			<Row>
 				<Col md={12}>
-					<div className={classes['category-click']} onClick={getExpenses}>Total: {dailyTotal} $</div>
+					<div className={`${classes['category-click']} ${classes['category-total']}`} onClick={getExpenses}>Total: {dailyTotal} $</div>
 					{categoryExpense &&
 						categoryExpense.map((cat, idx) => {
 							return cat.totalAmount > 0 ? <div className={classes['category-click']} key={idx} onClick={() => searchByCategory(cat)}>{cat.category} : {cat.totalAmount} $</div> : "";
@@ -281,8 +304,8 @@ const ListExpense = (props) => {
 												{
 													isEdit ? (
 														<>
-															<Button variant="primary" onClick={updateExpenseHandler} >Update</Button> &nbsp;
-															<Button variant="dark" onClick={cancelEditHandler} >Cancel</Button>
+															<Button variant="primary" onClick={updateExpenseHandler}>Update</Button> &nbsp;
+															<Button variant="dark" onClick={cancelEditHandler}> X </Button>
 														</>
 													) : (
 														<>

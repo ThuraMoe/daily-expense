@@ -25,36 +25,9 @@
     cursor: pointer; /* cursor-pointer */
     transition: all 0.2s ease-in-out; /* transition-all duration-300 ease-in-out */
 }
-.category {
-    /* Background and Text Color */
-    background-color: #DBEAFE; /* bg-blue-100 */
-    color: #1E40AF; /* text-blue-800 */
-
-    /* Padding and Spacing */
-    padding-left: 1.5rem; /* px-6 (1.5 * 16px = 24px) */
-    padding-right: 1.5rem; /* px-6 */
-    padding-top: 0.75rem; /* py-3 (0.75 * 16px = 12px) */
-    padding-bottom: 0.75rem; /* py-3 */
-    margin: 0.5rem; /* m-2 (0.5 * 16px = 8px) */
-
-    /* Rounded Corners */
-    border-radius: 0.75rem; /* rounded-xl (12px) */
-
-    /* Shadow */
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
-
-    /* Font and Text Styling */
-    font-weight: 600; /* font-semibold */
-    font-size: 1.125rem; /* text-lg (18px) */
-    text-align: center; /* text-center */
-
-    /* Interactivity */
-    cursor: pointer; /* cursor-pointer */
-    transition: all 0.3s ease-in-out; /* transition-all duration-300 ease-in-out */
-
-    /* Responsive Width */
-    width: 100%; /* w-full */
-    max-width: 16rem; /* max-w-xs (256px) */ /* Adjusted for better common max-width for buttons */
+.category-total {
+    background-color: rgb(3, 107, 110);
+    color: #fff;
 }
 
 .category-click:hover {
