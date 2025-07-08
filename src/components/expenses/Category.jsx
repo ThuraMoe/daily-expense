@@ -1,9 +1,14 @@
 const category = [
-    "Food",
-    "Transportation",
+    "Groceries",
+    "Dining Out",
+    "Snacks",
+    "Drink",
+    "Transport",
+    "Movie",
     "Personal Care",
     "Healthcare",
-    "Family & Friends",
+    "Family",
+    "Friends",
     "Trip",
 ];
 
