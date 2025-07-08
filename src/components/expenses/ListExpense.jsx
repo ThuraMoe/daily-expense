@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import app from "../../firebaseConfig";
-import { getDatabase, ref, get, remove } from "firebase/database";
+import { getDatabase, ref, get, remove, query, orderByChild, equalTo } from "firebase/database";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, InputGroup } from "react-bootstrap";
 import dayjs from "dayjs";
 import categoryList from "./Category";
 
@@ -14,10 +14,17 @@ const NO_DATA_ERR_MSG = "There has no data";
 const KHR_TO_USD_RATE = 4000;
 
 const ListExpense = (props) => {
-	let [expenses, setExpenses] = useState([]);
-	let [categoryExpense, setCategoryExpense] = useState([]);
-	let [dailyTotal, setDailyTotal] = useState(0);
-	let [expenseDate, setExpenseDate] = useState(dayjs().format("YYYY-MM-DD"));
+	const [expenses, setExpenses] = useState([]);
+	const [categoryExpense, setCategoryExpense] = useState([]);
+	const [dailyTotal, setDailyTotal] = useState(0);
+	const [expenseDate, setExpenseDate] = useState(dayjs().format("YYYY-MM-DD"));
+
+	// for editable part
+	const [isEdit, setIsEdit] = useState(false);
+	const [category, setCategory] = useState();
+	const [expenseName, setExpenseName] = useState("");
+	const [expenseAmount, setExpenseAmount] = useState("");
+	const [currency, setCurrency] = useState("usd");
 
 	useEffect(() => {
 		getExpenses();
@@ -31,7 +38,7 @@ const ListExpense = (props) => {
 
 	const showExpenseForSelectedDate = (e) => {
 		if (e.target.value != "") {
-			console.log("change date ", e.target.value);
+			setDailyTotal(0);
 			setExpenseDate(e.target.value);
 		}
 	};
@@ -55,7 +62,6 @@ const ListExpense = (props) => {
 		console.log("expenseDate ", expenseDate);
 		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}`);
 		const snapshot = await get(expenseRef);
-		console.log(snapshot);
 		if (snapshot.exists() && snapshot.hasChildren()) {
 			console.log(snapshot.val());
 			const expenses = Object.entries(snapshot.val()).map(
@@ -64,7 +70,6 @@ const ListExpense = (props) => {
 					...value,
 				})
 			);
-			console.log("expenses ", expenses);
 
 			// Initialize aggregated expenses with 0 for all categories in categoryList
 			const aggregatedExpenses = [];
@@ -104,6 +109,50 @@ const ListExpense = (props) => {
 		}
 	};
 
+	const searchByCategory = async (cat) => {
+		const categoryToSearch = cat.category;
+
+		// show all category data for selected date
+		const db = getDatabase(app);
+		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}`);
+
+		// search by category query
+		const q = query(expenseRef, orderByChild('category'), equalTo(categoryToSearch));
+		// execute query
+		const snapshot = await get(q);
+		console.log(snapshot.val());
+		if(snapshot.exists() ) {
+			const expenseByCategory = snapshot.val();
+
+			// convert expense object to array for easier use
+			const filteredExpense = Object.entries(expenseByCategory).map(([key, value]) => ({ key: key, ...value}));
+			setExpenses(filteredExpense);
+		}
+	}
+
+	const editExpenseHandler = (expense) => {
+		const defaultCategory = expense.category;
+		const expName = expense.name;
+		const amount = expense.amount;
+		const currency = expense.currency;
+
+		// enable editable input
+		setIsEdit(true);
+
+		// set original value
+		setCategory(defaultCategory);
+		setExpenseName(expName);
+		setExpenseAmount(amount);
+		setCurrency(currency);
+
+	}
+
+	const updateExpenseHandler = () => {};
+
+	const cancelEditHandler = () => {
+		setIsEdit(false);
+	};
+
 	const deleteHandler = async (key) => {
 		const db = getDatabase(app);
 		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}/${key}`);
@@ -114,28 +163,28 @@ const ListExpense = (props) => {
 	return (
 		<>
 			<Row>
-				<Col xs={8}>
+				<Col md={8} xs={12}>
 					<h3>List of Expenses</h3>
 				</Col>
-				<Col xs={2}>
+				<Col md={2} xs={8}>
 					<Form.Control
 						type="date"
 						value={expenseDate}
 						onChange={(e) => showExpenseForSelectedDate(e)}
 					/>
 				</Col>
-				<Col xs={2}>
+				<Col md={2} xs={4}>
 					<Button onClick={addNewExpenseHandler}>
-						Add New Expense
+						Add
 					</Button>
 				</Col>
 			</Row>
 			<Row>
-				<Col xs={12}>
-					<div className={classes.category}>{dailyTotal}</div>
+				<Col md={12}>
+					<div className={classes['category-click']} onClick={getExpenses}>Total: {dailyTotal} $</div>
 					{categoryExpense &&
 						categoryExpense.map((cat, idx) => {
-							return <div className={classes.category} key={idx}>{cat.category} : {cat.totalAmount}</div>;
+							return cat.totalAmount > 0 ? <div className={classes['category-click']} key={idx} onClick={() => searchByCategory(cat)}>{cat.category} : {cat.totalAmount} $</div> : "";
 						})
 					}
 				</Col>
@@ -154,27 +203,95 @@ const ListExpense = (props) => {
 						<tbody>
 							{expenses.length == 0 && (
 								<tr>
-									<td colSpan={3}>{NO_DATA_ERR_MSG}</td>
+									<td colSpan={4}>{NO_DATA_ERR_MSG}</td>
 								</tr>
 							)}
 							{expenses &&
 								expenses.map((expense) => {
 									return (
 										<tr key={expense.key}>
-											<td>{expense.category}</td>
-											<td>{expense.name}</td>
-											<td>{expense.amount} ({expense.currency.toUpperCase()})</td>
 											<td>
-												<button>Edit</button>
-												<button
-													onClick={() =>
-														deleteHandler(
-															expense.key
-														)
-													}
-												>
-													Delete
-												</button>
+												{
+													isEdit ? ( 
+														<Form.Select
+															aria-label="category"
+															value={category}
+															onChange={(e) => {
+																setCategory(e.target.value);
+															}}
+														>
+															{categoryList.map((cat) => (
+																<option key={cat} value={cat}>
+																	{cat}
+																</option>
+															))}
+														</Form.Select>
+													) : (
+														expense.category
+													)
+												}
+											</td>
+											<td>
+												{
+													isEdit ? (
+														<Form.Control
+															type="text"
+															placeholder="Enter Expense Name"
+															value={expenseName}
+															onChange={(e) => setExpenseName(e.target.value)}
+															autoFocus
+														/>
+													) : (
+														expense.name
+													)
+												}
+											</td>
+											<td>
+												{
+													isEdit ? (
+														<InputGroup>
+															<Form.Control
+																type="number"
+																placeholder="Enter Expense Amount"
+																value={expenseAmount}
+																onChange={(e) => {
+																	setExpenseAmount(e.target.value);
+																}}
+																style={{ width: "80%" }}
+															/>
+															<Form.Select
+																aria-label="currency"
+																style={{ width: "20%" }}
+																value={currency}
+																onChange={(e) => {
+																	setCurrency(e.target.value);
+																}}
+															>
+																<option value="usd">USD</option>
+																<option value="khr">Riel</option>
+																<option value="mmk">MMK</option>
+															</Form.Select>
+														</InputGroup>
+													) : (
+														`${expense.amount}  (${expense.currency.toUpperCase()})`
+													)
+												}
+											</td>
+											<td>
+												{
+													isEdit ? (
+														<>
+															<Button variant="primary" onClick={updateExpenseHandler} >Update</Button> &nbsp;
+															<Button variant="dark" onClick={cancelEditHandler} >Cancel</Button>
+														</>
+													) : (
+														<>
+															<Button variant="primary" onClick={() => editExpenseHandler(expense)}>Edit</Button> &nbsp;
+															<Button variant="danger" onClick={() => deleteHandler(expense.key)}>Delete</Button>
+														</>
+													)
+												}
+
 											</td>
 										</tr>
 									);

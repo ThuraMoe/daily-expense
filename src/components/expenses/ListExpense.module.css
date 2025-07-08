@@ -1,8 +1,71 @@
-.category {
+.category-click {
+    /* Background and Text Color */
+    background-color: #DBEAFE; /* bg-blue-100 */
+    color: #1E40AF; /* text-blue-800 */
     display: inline-block;
-    border: 1px solid #1c1c11;
-    border-radius: -100%;
-    margin: 5px;
-    padding: 5px;
-    box-shadow: 0px 2px 4px 0px #ccc;
+   /* Rounded Corners */
+    border-radius: 0.75rem; /* rounded-xl (12px) */
+
+    /* Shadow */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+
+    /* Padding and Spacing */
+    padding-left: 0.5rem; /* px-6 (1.5 * 16px = 24px) */
+    padding-right: 0.5rem; /* px-6 */
+    padding-top: 0.25rem; /* py-3 (0.75 * 16px = 12px) */
+    padding-bottom: 0.25rem; /* py-3 */
+    margin: 0.75rem 0.25rem; /* m-2 (0.5 * 16px = 8px) */
+
+    /* Font and Text Styling */
+    font-weight: 600; /* font-semibold */
+    font-size: 0.75rem; /* text-lg (18px) */
+    text-align: center; /* text-center */
+
+    /* Interactivity */
+    cursor: pointer; /* cursor-pointer */
+    transition: all 0.2s ease-in-out; /* transition-all duration-300 ease-in-out */
+}
+.category {
+    /* Background and Text Color */
+    background-color: #DBEAFE; /* bg-blue-100 */
+    color: #1E40AF; /* text-blue-800 */
+
+    /* Padding and Spacing */
+    padding-left: 1.5rem; /* px-6 (1.5 * 16px = 24px) */
+    padding-right: 1.5rem; /* px-6 */
+    padding-top: 0.75rem; /* py-3 (0.75 * 16px = 12px) */
+    padding-bottom: 0.75rem; /* py-3 */
+    margin: 0.5rem; /* m-2 (0.5 * 16px = 8px) */
+
+    /* Rounded Corners */
+    border-radius: 0.75rem; /* rounded-xl (12px) */
+
+    /* Shadow */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+
+    /* Font and Text Styling */
+    font-weight: 600; /* font-semibold */
+    font-size: 1.125rem; /* text-lg (18px) */
+    text-align: center; /* text-center */
+
+    /* Interactivity */
+    cursor: pointer; /* cursor-pointer */
+    transition: all 0.3s ease-in-out; /* transition-all duration-300 ease-in-out */
+
+    /* Responsive Width */
+    width: 100%; /* w-full */
+    max-width: 16rem; /* max-w-xs (256px) */ /* Adjusted for better common max-width for buttons */
+}
+
+.category-click:hover {
+    background-color: #BFDBFE; /* hover:bg-blue-200 */
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* hover:shadow-lg */
+    transform: scale(1.05); /* hover:scale-105 */
+}
+
+/* For small screens and up (sm: breakpoint in Tailwind, typically 640px) */
+@media (min-width: 640px) {
+    .category-click {
+        width: auto; /* sm:w-auto */
+    }
 }
