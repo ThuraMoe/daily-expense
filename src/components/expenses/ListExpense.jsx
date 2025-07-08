@@ -289,7 +289,7 @@ const ListExpense = (props) => {
 															<Button variant="primary" onClick={() => editExpenseHandler(expense)}>Edit</Button> &nbsp;
 															<Button variant="danger" onClick={() => deleteHandler(expense.key)}>Delete</Button>
 														</>
-													)
+													) 
 												}
 
 											</td>
