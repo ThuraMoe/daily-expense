@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 
 const AddExpense = (props) => {
 	
-	const [category, setCategory] = useState("Food");
+	const [category, setCategory] = useState(categoryList[0]);
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
 	const [currency, setCurrency] = useState("usd");
@@ -73,6 +73,7 @@ const AddExpense = (props) => {
 								setExpenseName(e.target.value);
 								setIsSave(false);
 							}}
+							autoFocus
 						/>
 					</Form.Group>
 
