@@ -10,6 +10,7 @@ const category = [
     "Family",
     "Friends",
     "Trip",
+    "Others",
 ];
 
 export default category;
