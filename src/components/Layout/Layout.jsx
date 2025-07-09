@@ -19,7 +19,6 @@ const Layout = () => {
 
 	return (
         <>
-            <Header/>
             <Container>
                 <AddExpense
                     onModalOpen={isOpen}

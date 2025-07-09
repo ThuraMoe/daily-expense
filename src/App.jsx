@@ -1,12 +1,10 @@
 import "./App.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Layout from "./components/Layout/Layout";
+import "bootstrap/dist/css/bootstrap.min.css";
+import WebRoute from "./WebRoute";
 
 function App() {
 	// return the JSX you want to render
-  return (
-    <Layout />
-  );
+	return <WebRoute/>;
 }
 
 export default App;
