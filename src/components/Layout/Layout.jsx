@@ -7,8 +7,12 @@ import ListExpense from "../expenses/ListExpense";
 const Layout = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isSave, setIsSave] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
 
-	const openExpenseModal = () => setIsOpen(true);
+	const openExpenseModal = (dateFromChild) => {
+        setSelectedDate(dateFromChild);
+        setIsOpen(true);
+    };
 	const closeExpenseModal = () => setIsOpen(false);
 	const saveExpenseData = () => setIsSave(true);
 	const resetIsSave = () => setIsSave(false);
@@ -21,6 +25,7 @@ const Layout = () => {
                     onModalOpen={isOpen}
                     onModalClose={closeExpenseModal}
                     onModalSave={saveExpenseData}
+                    onSelectDate={selectedDate}
                 />
                 <br />
                 <ListExpense

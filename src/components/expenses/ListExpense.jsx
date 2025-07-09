@@ -36,7 +36,7 @@ const ListExpense = (props) => {
 		}
 	}, [expenseDate, props.onIsSave]);
 
-	const addNewExpenseHandler = () => props.onNewExpense();
+	const addNewExpenseHandler = () => props.onNewExpense(expenseDate);
 
 	const showExpenseForSelectedDate = (e) => {
 		if (e.target.value != "") {

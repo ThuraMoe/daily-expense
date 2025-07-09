@@ -27,7 +27,10 @@ const AddExpense = (props) => {
 	const [isSave, setIsSave] = useState(false);
 	const [show, setShow] = useState(false);
 
-	useEffect(() => {setShow(props.onModalOpen)},[props.onModalOpen])
+	useEffect(() => {
+		setShow(props.onModalOpen);
+		setExpenseDate(props.onSelectDate);
+	},[props.onModalOpen]);
 
 	const addExpenseHandler = async () => {
 		const db = getDatabase(app);
