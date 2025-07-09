@@ -6,7 +6,8 @@ const RootLayout = () => {
     return (
         <>
             <Header/>
-            <Outlet/>
+            <Layout/>
+            {/* <Outlet/> */}
         </>
     )
 }
