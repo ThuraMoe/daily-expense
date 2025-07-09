@@ -12,6 +12,8 @@ import {
 	InputGroup,
 } from "react-bootstrap";
 import dayjs from "dayjs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 const AddExpense = (props) => {
 	
@@ -133,9 +135,11 @@ const AddExpense = (props) => {
 			</Modal.Body>
 
 			<Modal.Footer>
-				<Button variant="secondary" onClick={onCloseHandler}>Close</Button>
+				<Button variant="secondary" onClick={onCloseHandler}>
+					<FontAwesomeIcon icon={faXmark} />
+				</Button>
 				<Button variant="primary" onClick={addExpenseHandler}>
-					Save Expense
+					<FontAwesomeIcon icon={faFloppyDisk} />
 				</Button>
 			</Modal.Footer>
 		</Modal>

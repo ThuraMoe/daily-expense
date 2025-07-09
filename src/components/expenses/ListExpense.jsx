@@ -7,7 +7,8 @@ import Table from "react-bootstrap/Table";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import dayjs from "dayjs";
 import categoryList from "./Category";
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEraser, faFilePen, faFloppyDisk, faSquarePlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import classes from './ListExpense.module.css';
 
 const NO_DATA_ERR_MSG = "There has no data";
@@ -198,7 +199,7 @@ const ListExpense = (props) => {
 				</Col>
 				<Col md={2} xs={4}>
 					<Button onClick={addNewExpenseHandler}>
-						Add
+						<FontAwesomeIcon icon={faSquarePlus} />
 					</Button>
 				</Col>
 			</Row>
@@ -304,13 +305,21 @@ const ListExpense = (props) => {
 												{
 													isEdit ? (
 														<>
-															<Button variant="primary" onClick={updateExpenseHandler}>Update</Button> &nbsp;
-															<Button variant="dark" onClick={cancelEditHandler}> X </Button>
+															<Button variant="primary" size="sm" onClick={updateExpenseHandler}>
+																<FontAwesomeIcon icon={faFloppyDisk} />
+															</Button> &nbsp;
+															<Button variant="dark" size="sm" onClick={cancelEditHandler}>
+																<FontAwesomeIcon icon={faXmark} />
+															</Button>
 														</>
 													) : (
 														<>
-															<Button variant="primary" onClick={() => editExpenseHandler(expense)}>Edit</Button> &nbsp;
-															<Button variant="danger" onClick={() => deleteHandler(expense.key)}>Delete</Button>
+															<Button variant="primary" size="sm" onClick={() => editExpenseHandler(expense)}>
+																<FontAwesomeIcon icon={faFilePen} />
+															</Button> &nbsp;
+															<Button variant="danger" size="sm" onClick={() => deleteHandler(expense.key)}>
+																<FontAwesomeIcon icon={faEraser} />
+															</Button>
 														</>
 													) 
 												}
