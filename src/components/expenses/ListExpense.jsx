@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
 import app from "../../firebaseConfig";
-import { getDatabase, ref, get, remove, query, orderByChild, equalTo, update } from "firebase/database";
+import {
+	getDatabase,
+	ref,
+	get,
+	remove,
+	query,
+	orderByChild,
+	equalTo,
+	update,
+} from "firebase/database";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import dayjs from "dayjs";
 import categoryList from "./Category";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEraser, faFilePen, faFloppyDisk, faSquarePlus, faXmark } from '@fortawesome/free-solid-svg-icons'
-import classes from './ListExpense.module.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEraser, faFilePen, faFloppyDisk, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import classes from "./ListExpense.module.css";
+// import ExpenseRow from "./ExpenseRow";
 
 const NO_DATA_ERR_MSG = "There has no data";
 const KHR_TO_USD_RATE = 4000;
@@ -18,10 +28,12 @@ const ListExpense = (props) => {
 	const [expenses, setExpenses] = useState([]);
 	const [categoryExpense, setCategoryExpense] = useState([]);
 	const [dailyTotal, setDailyTotal] = useState(0);
-	const [expenseDate, setExpenseDate] = useState(dayjs().format("YYYY-MM-DD"));
+	const [expenseDate, setExpenseDate] = useState(
+		dayjs().format("YYYY-MM-DD")
+	);
 
 	// for editable part
-	const [isEdit, setIsEdit] = useState(false);
+	const [editRowId, setEditRowId] = useState(null);
 	const [category, setCategory] = useState();
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
@@ -78,7 +90,7 @@ const ListExpense = (props) => {
 			categoryList.forEach((category) => {
 				aggregatedExpenses[category] = { category: category, total: 0 };
 			});
-			
+
 			let totalCategoryExpense = 0;
 			expenses.forEach((expense) => {
 				const category = expense.category;
@@ -98,9 +110,11 @@ const ListExpense = (props) => {
 			console.log("aggrage ", aggregatedExpenses);
 
 			// convert the aggregated object to an array as requested
-			const totalExpenseForCategory = Object.values(aggregatedExpenses).map(item => ({
+			const totalExpenseForCategory = Object.values(
+				aggregatedExpenses
+			).map((item) => ({
 				category: item.category,
-				totalAmount: parseFloat(item.total.toFixed(2))
+				totalAmount: parseFloat(item.total.toFixed(2)),
 			}));
 			console.log(totalExpenseForCategory);
 			setCategoryExpense(totalExpenseForCategory);
@@ -119,18 +133,24 @@ const ListExpense = (props) => {
 		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}`);
 
 		// search by category query
-		const q = query(expenseRef, orderByChild('category'), equalTo(categoryToSearch));
+		const q = query(
+			expenseRef,
+			orderByChild("category"),
+			equalTo(categoryToSearch)
+		);
 		// execute query
 		const snapshot = await get(q);
 		console.log(snapshot.val());
-		if(snapshot.exists() ) {
+		if (snapshot.exists()) {
 			const expenseByCategory = snapshot.val();
 
 			// convert expense object to array for easier use
-			const filteredExpense = Object.entries(expenseByCategory).map(([key, value]) => ({ key: key, ...value}));
+			const filteredExpense = Object.entries(expenseByCategory).map(
+				([key, value]) => ({ key: key, ...value })
+			);
 			setExpenses(filteredExpense);
 		}
-	}
+	};
 
 	const editExpenseHandler = (expense) => {
 		const key = expense.key;
@@ -139,47 +159,50 @@ const ListExpense = (props) => {
 		const amount = expense.amount;
 		const currency = expense.currency;
 
-		// enable editable input
-		setIsEdit(true);
-
 		// set original value
+		setEditRowId(key);
 		setExpenseKey(key);
 		setCategory(defaultCategory);
 		setExpenseName(expName);
 		setExpenseAmount(amount);
 		setCurrency(currency);
-	}
+	};
 
 	const updateExpenseHandler = async () => {
-		
 		const db = getDatabase(app);
-		const updateExpenseRef =  ref(db, `expenses/daily-expenses/${expenseDate}/${expenseKey}`);
+		const updateExpenseRef = ref(
+			db,
+			`expenses/daily-expenses/${expenseDate}/${expenseKey}`
+		);
 
 		// updated data
 		const updatedData = {
 			name: expenseName,
 			category: category,
 			amount: expenseAmount,
-			currency: currency
+			currency: currency,
 		};
 
 		// update data
 		await update(updateExpenseRef, updatedData);
 
 		// close editable box
-		setIsEdit(false);
+		setEditRowId(null);
 
 		// call expense data again
 		getExpenses();
 	};
 
 	const cancelEditHandler = () => {
-		setIsEdit(false);
+		setEditRowId(false);
 	};
 
 	const deleteHandler = async (key) => {
 		const db = getDatabase(app);
-		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}/${key}`);
+		const expenseRef = ref(
+			db,
+			`expenses/daily-expenses/${expenseDate}/${key}`
+		);
 		await remove(expenseRef, null);
 		getExpenses();
 	};
@@ -205,12 +228,26 @@ const ListExpense = (props) => {
 			</Row>
 			<Row>
 				<Col md={12}>
-					<div className={`${classes['category-click']} ${classes['category-total']}`} onClick={getExpenses}>Total: {dailyTotal} $</div>
+					<div
+						className={`${classes["category-click"]} ${classes["category-total"]}`}
+						onClick={getExpenses}
+					>
+						Total: {dailyTotal} $
+					</div>
 					{categoryExpense &&
 						categoryExpense.map((cat, idx) => {
-							return cat.totalAmount > 0 ? <div className={classes['category-click']} key={idx} onClick={() => searchByCategory(cat)}>{cat.category} : {cat.totalAmount} $</div> : "";
-						})
-					}
+							return cat.totalAmount > 0 ? (
+								<div
+									className={classes["category-click"]}
+									key={idx}
+									onClick={() => searchByCategory(cat)}
+								>
+									{cat.category} : {cat.totalAmount} $
+								</div>
+							) : (
+								""
+							);
+						})}
 				</Col>
 			</Row>
 			<Row>
@@ -234,97 +271,159 @@ const ListExpense = (props) => {
 								expenses.map((expense) => {
 									return (
 										<tr key={expense.key}>
-											<td>
-												{
-													isEdit ? ( 
-														<Form.Select
-															aria-label="category"
-															value={category}
-															onChange={(e) => {
-																setCategory(e.target.value);
-															}}
-														>
-															{categoryList.map((cat) => (
-																<option key={cat} value={cat}>
-																	{cat}
-																</option>
-															))}
-														</Form.Select>
-													) : (
-														expense.category
-													)
-												}
-											</td>
-											<td>
-												{
-													isEdit ? (
-														<Form.Control
-															type="text"
-															placeholder="Enter Expense Name"
-															value={expenseName}
-															onChange={(e) => setExpenseName(e.target.value)}
-															autoFocus
-														/>
-													) : (
-														expense.name
-													)
-												}
-											</td>
-											<td>
-												{
-													isEdit ? (
-														<InputGroup>
-															<Form.Control
-																type="number"
-																placeholder="Enter Expense Amount"
-																value={expenseAmount}
-																onChange={(e) => {
-																	setExpenseAmount(e.target.value);
-																}}
-																style={{ width: "80%" }}
-															/>
+											{
+												editRowId === expense.key ? (
+													<>
+														<td>
 															<Form.Select
-																aria-label="currency"
-																style={{ width: "20%" }}
-																value={currency}
+																aria-label="category"
+																value={category}
 																onChange={(e) => {
-																	setCurrency(e.target.value);
+																	setCategory(
+																		e.target.value
+																	);
 																}}
 															>
-																<option value="usd">USD</option>
-																<option value="khr">Riel</option>
-																<option value="mmk">MMK</option>
+																{categoryList.map(
+																	(cat) => (
+																		<option
+																			key={cat}
+																			value={cat}
+																		>
+																			{cat}
+																		</option>
+																	)
+																)}
 															</Form.Select>
-														</InputGroup>
-													) : (
-														`${expense.amount}  (${expense.currency.toUpperCase()})`
-													)
-												}
-											</td>
-											<td>
-												{
-													isEdit ? (
-														<>
-															<Button variant="primary" size="sm" onClick={updateExpenseHandler}>
-																<FontAwesomeIcon icon={faFloppyDisk} />
-															</Button> &nbsp;
-															<Button variant="dark" size="sm" onClick={cancelEditHandler}>
-																<FontAwesomeIcon icon={faXmark} />
+														</td>
+														<td>
+															<Form.Control
+																type="text"
+																placeholder="Enter Expense Name"
+																value={expenseName}
+																onChange={(e) =>
+																	setExpenseName(
+																		e.target.value
+																	)
+																}
+																autoFocus
+															/>
+														</td>
+														<td>
+															<InputGroup>
+																<Form.Control
+																	type="number"
+																	placeholder="Enter Expense Amount"
+																	value={
+																		expenseAmount
+																	}
+																	onChange={(e) => {
+																		setExpenseAmount(
+																			e.target
+																				.value
+																		);
+																	}}
+																	style={{
+																		width: "80%",
+																	}}
+																/>
+																<Form.Select
+																	aria-label="currency"
+																	style={{
+																		width: "20%",
+																	}}
+																	value={currency}
+																	onChange={(e) => {
+																		setCurrency(
+																			e.target
+																				.value
+																		);
+																	}}
+																>
+																	<option value="usd">
+																		USD
+																	</option>
+																	<option value="khr">
+																		Riel
+																	</option>
+																	<option value="mmk">
+																		MMK
+																	</option>
+																</Form.Select>
+															</InputGroup>
+														</td>
+														<td>
+															<Button
+																variant="primary"
+																size="sm"
+																onClick={
+																	updateExpenseHandler
+																}
+															>
+																<FontAwesomeIcon
+																	icon={
+																		faFloppyDisk
+																	}
+																/>
+															</Button>{" "}
+															&nbsp;
+															<Button
+																variant="dark"
+																size="sm"
+																onClick={
+																	cancelEditHandler
+																}
+															>
+																<FontAwesomeIcon
+																	icon={faXmark}
+																/>
 															</Button>
-														</>
-													) : (
-														<>
-															<Button variant="primary" size="sm" onClick={() => editExpenseHandler(expense)}>
-																<FontAwesomeIcon icon={faFilePen} />
-															</Button> &nbsp;
-															<Button variant="danger" size="sm" onClick={() => deleteHandler(expense.key)}>
-																<FontAwesomeIcon icon={faEraser} />
+														</td>
+													</>
+												) : (
+													<>
+														<td>{expense.category}</td>
+														<td>{expense.name}</td>
+														<td>{`${expense.amount}  (${expense.currency.toUpperCase()})`}</td>
+														<td>
+															<Button
+																variant="primary"
+																size="sm"
+																onClick={() =>
+																	editExpenseHandler(
+																		expense
+																	)
+																}
+															>
+																<FontAwesomeIcon
+																	icon={faFilePen}
+																/>
+															</Button>{" "}
+															&nbsp;
+															<Button
+																variant="danger"
+																size="sm"
+																onClick={() =>
+																	deleteHandler(
+																		expense.key
+																	)
+																}
+															>
+																<FontAwesomeIcon
+																	icon={faEraser}
+																/>
 															</Button>
-														</>
-													) 
-												}
+														</td>
+													</>
+												)
+											}
 
-											</td>
+
+
+
+
+
+											
 										</tr>
 									);
 								})}
