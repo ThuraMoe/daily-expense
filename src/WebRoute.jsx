@@ -1,14 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ListExpense from "./components/expenses/ListExpense";
 import SummaryExpense from "./components/expenses/SummaryExpense";
-import RootLayout from "./components/RootLayout";
+import Expenses from "./components/expenses/Expenses";
+import Layout from "./components/Layout/Layout";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <RootLayout />,
+		element: <Layout />,
 		children: [
-			{ path: "/", element: <ListExpense /> },
+			{ path: "/", element: <Expenses /> },
 			{ path: "/summary", element: <SummaryExpense /> },
 		],
 	},
