@@ -18,11 +18,12 @@ import dayjs from "dayjs";
 import categoryList from "./Category";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faFilePen, faFloppyDisk, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import * as Utils from "../../Utils/Utils";
 import classes from "./ListExpense.module.css";
+
 // import ExpenseRow from "./ExpenseRow";
 
 const NO_DATA_ERR_MSG = "There has no data";
-const KHR_TO_USD_RATE = 4000;
 
 const ListExpense = (props) => {
 	const [expenses, setExpenses] = useState([]);
@@ -57,20 +58,6 @@ const ListExpense = (props) => {
 		}
 	};
 
-	const convertToUsd = (amount, currency) => {
-		const numericAmount = parseFloat(amount);
-		if (isNaN(numericAmount)) {
-			return 0;
-		}
-
-		if (currency === "usd") {
-			return numericAmount;
-		} else if (currency === "khr") {
-			return numericAmount / KHR_TO_USD_RATE;
-		}
-		return 0;
-	};
-
 	const getExpenses = async () => {
 		const db = getDatabase(app);
 		console.log("expenseDate ", expenseDate);
@@ -96,7 +83,7 @@ const ListExpense = (props) => {
 				const category = expense.category;
 				const amount = expense.amount;
 				const currency = expense.currency;
-				const amountInUsd = convertToUsd(amount, currency);
+				const amountInUsd = Utils.convertToUsd(amount, currency);
 				// console.log('amount in usd ', amountInUsd);
 
 				// If the category doesn't exist in aggregatedExpenses yet, initialize it to 0.

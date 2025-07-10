@@ -25,7 +25,6 @@ const Layout = () => {
                     onModalSave={saveExpenseData}
                     onSelectDate={selectedDate}
                 />
-                <br />
                 <ListExpense
                     onNewExpense={openExpenseModal}
                     onIsSave={isSave}
