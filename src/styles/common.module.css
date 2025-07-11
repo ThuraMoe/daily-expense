@@ -1,7 +1,7 @@
 .category-click {
     /* Background and Text Color */
-    background-color: #DBEAFE; /* bg-blue-100 */
-    color: #1E40AF; /* text-blue-800 */
+    background-color: #FFA500; /* bg-blue-100 */
+    color: #111; /* text-blue-800 */
     display: inline-block;
    /* Rounded Corners */
     border-radius: 0.75rem; /* rounded-xl (12px) */
@@ -26,12 +26,13 @@
     transition: all 0.2s ease-in-out; /* transition-all duration-300 ease-in-out */
 }
 .category-total {
-    background-color: rgb(3, 107, 110);
+    background-color: #a10000;
     color: #fff;
 }
 
 .category-click:hover {
-    background-color: #BFDBFE; /* hover:bg-blue-200 */
+    background-color: #cc8605; /* hover:bg-blue-200 */
+    color: #fff;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* hover:shadow-lg */
     transform: scale(1.05); /* hover:scale-105 */
 }
@@ -41,4 +42,17 @@
     .category-click {
         width: auto; /* sm:w-auto */
     }
+}
+
+.total {
+    background-color: #e6af0b !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.date-click:hover {
+    cursor: pointer;
+    font-style: italic;
+    font-weight: bold;
+    transition: all 0.8s ease-in-out;
 }

@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import app from "../../firebaseConfig";
-import categoryList from "./Category";
 import { getDatabase, ref, set, push } from "firebase/database";
 import {
 	Row,
@@ -14,8 +12,10 @@ import {
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
+import app from "../../firebaseConfig";
+import categoryList from "../../utils/CategoryList";
 
-const AddExpense = (props) => {
+const ExpenseForm = (props) => {
 	
 	const [category, setCategory] = useState(categoryList[0]);
 	const [expenseName, setExpenseName] = useState("");
@@ -148,4 +148,4 @@ const AddExpense = (props) => {
 		</Modal>
 	);
 };
-export default AddExpense;
+export default ExpenseForm;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import * as Utils from "../../Utils/Utils.js";
+import * as Utils from "../../utils/Utils.js";
 import { Col, InputGroup, Row, Form, Container, Table } from "react-bootstrap";
 import {
 	endAt,
@@ -10,15 +10,17 @@ import {
 	ref,
 	startAt,
 } from "firebase/database";
-import categoryList from "./Category.jsx";
 import app from "../../firebaseConfig.js";
+import classes from "../../styles/common.module.css";
+import DailyExpenseSummary from "./DailyExpenseSummary.jsx";
+import categoryList from "../../utils/CategoryList.js";
 
-const NO_DATA_ERR_MSG = "There has no data";
-
-const SummaryExpense = () => {
+const ExpenseOverview = () => {
 	const [fromDate, setFromDate] = useState(null);
 	const [toDate, setToDate] = useState(null);
-    const [summaryExpense, setSummaryExpense] = useState([]);
+	const [summaryExpense, setSummaryExpense] = useState([]);
+	const [totalExpense, setTotalExpense] = useState([]);
+	const [rangeTotal, setRangeTotal] = useState(0);
 
 	// to calculate from, to date when component start
 	useEffect(() => {
@@ -50,12 +52,6 @@ const SummaryExpense = () => {
 		// need to fetch data when both date exists in correct
 		if (fromDate && toDate && fromDate < toDate) {
 			fetchExpenseByDateRange();
-			console.log(
-				"user is selected from Date ",
-				fromDate,
-				" and to Date ",
-				toDate
-			);
 		}
 	}, [fromDate, toDate]);
 
@@ -91,20 +87,30 @@ const SummaryExpense = () => {
 				date: key, // The date is the key
 				...expensesData[key], // The actual expense data for that date
 			}));
-			console.log("Expenses within date range:", expensesArray);
-			// Initialize aggregated expenses with 0 for all categories in categoryList
-			const aggregatedExpenses = [];
-			categoryList.forEach((category) => {
-				aggregatedExpenses[category] = { category: category, total: 0 };
-			});
-			console.log(aggregatedExpenses);
-            const summaryByDate = [];
-			expensesArray.forEach((expense) => {
-                let totalCategoryExpense = 0;
-				const date = expense.date;
-				console.log("expense ", expense);
 
-                // iterate each item under the same date
+			// Initialize aggregated expenses with 0 for all categories in categoryList
+			const totalExpenseByCategory = [];
+			categoryList.forEach((category) => {
+				totalExpenseByCategory[category] = { category: category, total: 0 };
+			});
+			
+			const summaryByDate = [];
+			let sumAllCategory = 0;
+			expensesArray.forEach((expense) => {
+				let totalCategoryExpense = 0;
+				const date = expense.date;
+
+				// Initialize aggregated expenses with 0 for all categories in categoryList
+				const aggregatedExpenses = [];
+				categoryList.forEach((category) => {
+					aggregatedExpenses[category] = {
+						category: category,
+						total: 0,
+					};
+				});
+				console.log(aggregatedExpenses);
+
+				// iterate each item under the same date
 				for (const key in expense) {
 					// skip date key
 					if (key != "date") {
@@ -112,30 +118,51 @@ const SummaryExpense = () => {
 						const category = expenseItem.category;
 						const amount = expenseItem.amount;
 						const currency = expenseItem.currency;
-						const amountInUsd = Utils.convertToUsd(amount, currency);
+						const amountInUsd = Utils.convertToUsd(
+							amount,
+							currency
+						);
 
-                        // If the category doesn't exist in aggregatedExpenses yet, initialize it to 0.
-                        // Then add the current expense amount. This handles all categories dynamically.
-                        if (aggregatedExpenses.hasOwnProperty(category)) {
-                            aggregatedExpenses[category].total += amountInUsd;
-                            totalCategoryExpense += amountInUsd;
-                        }
+						// If the category doesn't exist in aggregatedExpenses yet, initialize it to 0.
+						// Then add the current expense amount. This handles all categories dynamically.
+						if (aggregatedExpenses.hasOwnProperty(category)) {
+							aggregatedExpenses[category].total += amountInUsd;
+							totalExpenseByCategory[category].total += amountInUsd;
+							totalCategoryExpense += amountInUsd;
+							sumAllCategory += amountInUsd;
+						}
 					}
 				}
-                // push it to summary array after format
-                summaryByDate.push({
-                    date: date,
-                    sumByCategory: aggregatedExpenses, 
-                    subTotal: totalCategoryExpense.toFixed(2)
-                });
+				// push it to summary array after format
+				summaryByDate.push({
+					date: date,
+					sumByCategory: aggregatedExpenses,
+					subTotal: totalCategoryExpense.toFixed(2),
+				});
 			});
 			console.log("final ");
-            console.log(summaryByDate);
-            setSummaryExpense(summaryByDate);
+			console.log(summaryByDate);
+			console.log('total exp by category');
+			setSummaryExpense(summaryByDate);
+			console.log(sumAllCategory);
+			setRangeTotal(sumAllCategory.toFixed(2));
+			
+			// convert the aggregated object to an array as requested
+			console.log(totalExpenseByCategory);
+			const totalExpenseForCategory = Object.values(
+				totalExpenseByCategory
+			).map((item) => ({
+				category: item.category,
+				totalAmount: parseFloat(item.total.toFixed(2)),
+			}));
+			console.log(totalExpenseForCategory);
+			setTotalExpense(totalExpenseForCategory);
 		} else {
 			setSummaryExpense([]);
 		}
 	};
+
+	
 
 	return (
 		<>
@@ -166,54 +193,32 @@ const SummaryExpense = () => {
 						</InputGroup>
 					</Col>
 				</Row>
-                <Row>
-				<Col xs={12}>
-					<Table striped bordered hover>
-						<thead>
-							<tr>
-								<th>Date</th>
-								<th>Total</th>
-								{
-                                    categoryList.map((category) => (
-                                        <th>{category}</th>
-                                    ))
-                                }
-							</tr>
-						</thead>
-						<tbody>
-							{summaryExpense.length == 0 && (
-								<tr>
-									<td colSpan={4}>{NO_DATA_ERR_MSG}</td>
-								</tr>
-							)}
-							{summaryExpense &&
-								summaryExpense.map((expense) => (
-                                    <tr key={expense.date}>
-                                        <td>{expense.date}</td>
-                                        <td>{expense.subTotal}</td>
-                                        {
-                                            // Map over the categoryList to ensure order and presence of all categories
-                                            // categoryList.map((category) => {
-                                            //     const categoryTile = expense.sumByCategory[category];
-                                            //     const amount = 0;
-                                            //     console.log(categoryTile);
-                                            //     return (
-                                            //         <td key={`${expense.date}-${category}`}>
-                                            //             {amount > 0 ? `$${amount.toFixed(2)}` : '-'} {/* Display amount or '-' */}
-                                            //         </td>
-                                            //     );
-                                            // })
-                                        }
-                                    </tr>
-                                ))
-                            }
-						</tbody>
-					</Table>
-				</Col>
-			</Row>
+				<Row>
+					<Col xs={12}>
+						<div className={`${classes["category-click"]} ${classes["category-total"]}`}>
+							Total: {rangeTotal} $
+						</div>
+						{totalExpense &&
+							totalExpense.map((cat, idx) => {
+								return cat.totalAmount > 0 ? (
+									<div
+										className={classes["category-click"]}
+										key={idx}
+									>
+										{cat.category} : {cat.totalAmount} $
+									</div>
+								) : (
+									""
+								);
+							})}
+					</Col>
+				</Row>
+
+				<DailyExpenseSummary summaryExpense={summaryExpense} />
+
 			</Container>
 		</>
 	);
 };
 
-export default SummaryExpense;
+export default ExpenseOverview;

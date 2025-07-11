@@ -1,0 +1,1 @@
+export const NO_DATA_ERR_MSG = "There has no data";

@@ -15,23 +15,23 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import dayjs from "dayjs";
-import categoryList from "./Category";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faFilePen, faFloppyDisk, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
-import * as Utils from "../../Utils/Utils";
-import classes from "./ListExpense.module.css";
+import * as Utils from "../../utils/Utils";
+import classes from "../../styles/common.module.css";
+import { useSearchParams } from "react-router-dom";
+import { NO_DATA_ERR_MSG } from "../../utils/Constant";
+import categoryList from "../../utils/CategoryList";
 
-// import ExpenseRow from "./ExpenseRow";
 
-const NO_DATA_ERR_MSG = "There has no data";
-
-const ListExpense = (props) => {
+const ExpenseList = (props) => {
 	const [expenses, setExpenses] = useState([]);
 	const [categoryExpense, setCategoryExpense] = useState([]);
 	const [dailyTotal, setDailyTotal] = useState(0);
 	const [expenseDate, setExpenseDate] = useState(
 		dayjs().format("YYYY-MM-DD")
 	);
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	// for editable part
 	const [editRowId, setEditRowId] = useState(null);
@@ -42,6 +42,14 @@ const ListExpense = (props) => {
 	const [expenseKey, setExpenseKey] = useState(null);
 
 	useEffect(() => {
+
+		// Get the value of the 'date' parameter
+    	const dateFromUrl = searchParams.get('date');
+		if(dateFromUrl) {
+			setExpenseDate(dateFromUrl);
+		}
+		console.log('date from url ', dateFromUrl);
+
 		getExpenses();
 
 		if (props.onIsSave) {
@@ -422,4 +430,4 @@ const ListExpense = (props) => {
 	);
 };
 
-export default ListExpense;
+export default ExpenseList;

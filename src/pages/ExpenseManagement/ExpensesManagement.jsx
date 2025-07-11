@@ -1,9 +1,9 @@
 import { Container } from "react-bootstrap";
 import { useState } from "react";
-import AddExpense from "./AddExpense";
-import ListExpense from "./ListExpense";
+import ExpenseForm from "./ExpenseForm";
+import ExpenseList from "./ExpenseList";
 
-const Layout = () => {
+const ExpenseManagement = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isSave, setIsSave] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -19,13 +19,13 @@ const Layout = () => {
 	return (
         <>
             <Container>
-                <AddExpense
+                <ExpenseForm
                     onModalOpen={isOpen}
                     onModalClose={closeExpenseModal}
                     onModalSave={saveExpenseData}
                     onSelectDate={selectedDate}
                 />
-                <ListExpense
+                <ExpenseList
                     onNewExpense={openExpenseModal}
                     onIsSave={isSave}
                     onResetSave={resetIsSave}
@@ -35,4 +35,4 @@ const Layout = () => {
 	);
 };
 
-export default Layout;
+export default ExpenseManagement;

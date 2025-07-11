@@ -1,4 +1,4 @@
-const category = [
+const categoryList = [
     "Groceries",
     "Dining Out",
     "Snacks",
@@ -13,4 +13,4 @@ const category = [
     "Others",
 ];
 
-export default category;
+export default categoryList;
