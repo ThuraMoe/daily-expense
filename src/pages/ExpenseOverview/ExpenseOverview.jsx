@@ -3,8 +3,10 @@ import * as Utils from "../../utils/Utils.js";
 import { Col, InputGroup, Row, Form, Container, Table } from "react-bootstrap";
 import {
 	endAt,
+	equalTo,
 	get,
 	getDatabase,
+	orderByChild,
 	orderByKey,
 	query,
 	ref,
@@ -21,6 +23,7 @@ const ExpenseOverview = () => {
 	const [summaryExpense, setSummaryExpense] = useState([]);
 	const [totalExpense, setTotalExpense] = useState([]);
 	const [rangeTotal, setRangeTotal] = useState(0);
+	const [filteredCategoryExpenses, setfilteredCategoryExpenses] = useState([]);
 
 	// to calculate from, to date when component start
 	useEffect(() => {
@@ -80,6 +83,7 @@ const ExpenseOverview = () => {
 		const snapshot = await get(q);
 		if (snapshot.exists() && snapshot.hasChildren()) {
 			const expensesData = snapshot.val();
+			console.log("fetch expenses by date range");
 			console.log(snapshot.val());
 			// Firebase returns an object for ordered queries.
 			// Convert it to an array if you need to iterate over it easily.
@@ -108,7 +112,6 @@ const ExpenseOverview = () => {
 						total: 0,
 					};
 				});
-				console.log(aggregatedExpenses);
 
 				// iterate each item under the same date
 				for (const key in expense) {
@@ -140,29 +143,67 @@ const ExpenseOverview = () => {
 					subTotal: totalCategoryExpense.toFixed(2),
 				});
 			});
-			console.log("final ");
-			console.log(summaryByDate);
-			console.log('total exp by category');
 			setSummaryExpense(summaryByDate);
-			console.log(sumAllCategory);
 			setRangeTotal(sumAllCategory.toFixed(2));
 			
 			// convert the aggregated object to an array as requested
-			console.log(totalExpenseByCategory);
-			const totalExpenseForCategory = Object.values(
-				totalExpenseByCategory
-			).map((item) => ({
+			const totalExpenseForCategory = Object.values(totalExpenseByCategory).map((item) => ({
 				category: item.category,
 				totalAmount: parseFloat(item.total.toFixed(2)),
 			}));
-			console.log(totalExpenseForCategory);
 			setTotalExpense(totalExpenseForCategory);
 		} else {
 			setSummaryExpense([]);
 		}
 	};
 
-	
+	const categoryClickActionHandler = async (selectedCategory) => {
+		console.log("he is clicked ", selectedCategory);
+		const categoryToSearch = selectedCategory;
+
+		// show all category data for selected date
+		const db = getDatabase(app);
+		const expenseRef = ref(db, `expenses/daily-expenses`);
+
+		// search by category query
+		const q = query(
+			expenseRef,
+			orderByKey(), // Order by the date keys
+			startAt(fromDate), // Start at the specified fromDate (inclusive)
+			endAt(toDate) // End at the specified toDate (inclusive)
+		);
+		// execute query
+		const snapshot = await get(q);
+		console.log(snapshot.val());
+		if (snapshot.exists()) {
+			const expenseByCategory = snapshot.val();
+
+			// convert expense object to array for easier use
+			const formattedData = Object.entries(expenseByCategory).map(
+				([key, value]) => ({ date: key, ...value })
+			);
+			console.log('formattedData ', formattedData);
+
+			// extract only selected category data
+			const filteredData = [];
+			formattedData.forEach((data) => {
+				
+				for(const key in data) {
+					if(key !== 'date') {
+						const row = data[key];
+						if(row.category === categoryToSearch) {
+							console.log(row.category, " == ", categoryToSearch);
+							
+							filteredData.push([row, {date: data['date']}]);
+						}
+					}
+				}
+			});
+			console.log('final filtereddata ');
+			console.log(filteredData);
+			// setExpenses(filteredExpense);
+		}
+	}
 
 	return (
 		<>
@@ -193,28 +234,13 @@ const ExpenseOverview = () => {
 						</InputGroup>
 					</Col>
 				</Row>
-				<Row>
-					<Col xs={12}>
-						<div className={`${classes["category-click"]} ${classes["category-total"]}`}>
-							Total: {rangeTotal} $
-						</div>
-						{totalExpense &&
-							totalExpense.map((cat, idx) => {
-								return cat.totalAmount > 0 ? (
-									<div
-										className={classes["category-click"]}
-										key={idx}
-									>
-										{cat.category} : {cat.totalAmount} $
-									</div>
-								) : (
-									""
-								);
-							})}
-					</Col>
-				</Row>
-
-				<DailyExpenseSummary summaryExpense={summaryExpense} />
+				
+				<DailyExpenseSummary 
+					summaryExpense={summaryExpense} 
+					totalExpense={totalExpense} 
+					rangeTotal={rangeTotal} 
+					onAction={categoryClickActionHandler}
+				/>
 
 			</Container>
 		</>
