@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import * as Utils from "../../temp_utils_folder/Utils.js";
+import * as Utils from "../../utils/Utils.js";
 import { Col, InputGroup, Row, Form, Container, Table } from "react-bootstrap";
 import {
 	endAt,
@@ -13,7 +13,7 @@ import {
 import app from "../../firebaseConfig.js";
 import classes from "../../styles/common.module.css";
 import DailyExpenseSummary from "./DailyExpenseSummary.jsx";
-import categoryList from "../../temp_utils_folder/CategoryList.js";
+import categoryList from "../../utils/CategoryList.js";
 
 const ExpenseOverview = () => {
 	const [fromDate, setFromDate] = useState(null);
