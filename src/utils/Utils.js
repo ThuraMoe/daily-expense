@@ -1,3 +1,5 @@
+import * as Constant from "./Constant";
+
 /**
  * Convert date string to 'YYYY-MM-DD'
  * @param dateObj
@@ -15,7 +17,6 @@ export const dateFormatHelper = (dateObj) => {
  * @param {*} currency 
  * @returns 
  */
-const KHR_TO_USD_RATE = 4000;
 export const convertToUsd = (amount, currency) => {
         const numericAmount = parseFloat(amount);
         if (isNaN(numericAmount)) {
@@ -25,7 +26,7 @@ export const convertToUsd = (amount, currency) => {
         if (currency === "usd") {
             return numericAmount;
         } else if (currency === "khr") {
-            return numericAmount / KHR_TO_USD_RATE;
+            return numericAmount / Constant.KHR_TO_USD_RATE;
         }
         return 0;
     };
