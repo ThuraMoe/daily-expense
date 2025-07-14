@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Col, Row, Table } from "react-bootstrap";
-import { NO_DATA_ERR_MSG } from "../../utils/Constant";
-import categoryList from "../../utils/CategoryList";
+import { NO_DATA_ERR_MSG } from "../../temp_utils_folder/Constant";
+import categoryList from "../../temp_utils_folder/CategoryList";
 import classes from "../../styles/common.module.css";
 
 const DailyExpenseSummary = ({summaryExpense}) => {

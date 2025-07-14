@@ -13,7 +13,7 @@ import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
 import app from "../../firebaseConfig";
-import categoryList from "../../utils/CategoryList";
+import categoryList from "../../temp_utils_folder/CategoryList";
 
 const ExpenseForm = (props) => {
 	
