@@ -3,16 +3,14 @@ import * as Utils from "../../utils/Utils.js";
 import { Col, InputGroup, Row, Form, Container, Table } from "react-bootstrap";
 import {
 	endAt,
-	equalTo,
 	get,
 	getDatabase,
-	orderByChild,
 	orderByKey,
 	query,
 	ref,
 	startAt,
 } from "firebase/database";
-import app from "../../firebaseConfig.js";
+import { app } from "../../firebaseConfig.js";
 import classes from "../../styles/common.module.css";
 import DailyExpenseSummary from "./DailyExpenseSummary.jsx";
 import categoryList from "../../utils/CategoryList.js";

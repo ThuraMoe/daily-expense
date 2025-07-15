@@ -10,6 +10,7 @@ const Header = () => {
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="me-auto">
 						<Nav.Link as={NavLink} to="/">Daily List</Nav.Link>
+						<Nav.Link as={NavLink} to="/login">Login</Nav.Link>
 						<Nav.Link as={NavLink} to="/overview">Overview</Nav.Link>
 					</Nav>
 				</Navbar.Collapse>
