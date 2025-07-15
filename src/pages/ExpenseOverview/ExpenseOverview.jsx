@@ -86,8 +86,6 @@ const ExpenseOverview = () => {
 		const snapshot = await get(q);
 		if (snapshot.exists() && snapshot.hasChildren()) {
 			const expensesData = snapshot.val();
-			console.log("fetch expenses by date range");
-			console.log(snapshot.val());
 			// Firebase returns an object for ordered queries.
 			// Convert it to an array if you need to iterate over it easily.
 			const expensesArray = Object.keys(expensesData).map((key) => ({
@@ -182,7 +180,6 @@ const ExpenseOverview = () => {
 		);
 		// execute query
 		const snapshot = await get(q);
-		console.log(snapshot.val());
 		if (snapshot.exists()) {
 			const expenseByCategory = snapshot.val();
 
@@ -190,7 +187,6 @@ const ExpenseOverview = () => {
 			const formattedData = Object.entries(expenseByCategory).map(
 				([key, value]) => ({ date: key, ...value })
 			);
-			console.log('formattedData ', formattedData);
 
 			// extract only selected category data
 			const filteredData = [];
@@ -204,8 +200,6 @@ const ExpenseOverview = () => {
 					}
 				}
 			});
-			console.log('final filtereddata ');
-			console.log(filteredData);
 			setfilteredCategoryExpenses(filteredData);
 
 			// show category view

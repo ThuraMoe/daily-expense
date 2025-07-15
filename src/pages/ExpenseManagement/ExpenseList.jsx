@@ -48,7 +48,6 @@ const ExpenseList = (props) => {
 		if(dateFromUrl) {
 			setExpenseDate(dateFromUrl);
 		}
-		console.log('date from url ', dateFromUrl);
 
 		getExpenses();
 
@@ -68,11 +67,9 @@ const ExpenseList = (props) => {
 
 	const getExpenses = async () => {
 		const db = getDatabase(app);
-		console.log("expenseDate ", expenseDate);
 		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}`);
 		const snapshot = await get(expenseRef);
 		if (snapshot.exists() && snapshot.hasChildren()) {
-			console.log(snapshot.val());
 			const expenses = Object.entries(snapshot.val()).map(
 				([key, value]) => ({
 					key: key,
@@ -92,7 +89,6 @@ const ExpenseList = (props) => {
 				const amount = expense.amount;
 				const currency = expense.currency;
 				const amountInUsd = Utils.convertToUsd(amount, currency);
-				// console.log('amount in usd ', amountInUsd);
 
 				// If the category doesn't exist in aggregatedExpenses yet, initialize it to 0.
 				// Then add the current expense amount. This handles all categories dynamically.
@@ -102,7 +98,6 @@ const ExpenseList = (props) => {
 				}
 			});
 			setDailyTotal(totalCategoryExpense.toFixed(2));
-			console.log("aggrage ", aggregatedExpenses);
 
 			// convert the aggregated object to an array as requested
 			const totalExpenseForCategory = Object.values(
@@ -111,7 +106,6 @@ const ExpenseList = (props) => {
 				category: item.category,
 				totalAmount: parseFloat(item.total.toFixed(2)),
 			}));
-			console.log(totalExpenseForCategory);
 			setCategoryExpense(totalExpenseForCategory);
 			setExpenses(expenses);
 		} else {
@@ -135,7 +129,6 @@ const ExpenseList = (props) => {
 		);
 		// execute query
 		const snapshot = await get(q);
-		console.log(snapshot.val());
 		if (snapshot.exists()) {
 			const expenseByCategory = snapshot.val();
 

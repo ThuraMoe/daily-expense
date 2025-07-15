@@ -43,7 +43,6 @@ const ExpenseForm = (props) => {
 			category: category,
 		})
 			.then(() => {
-				console.log("Document successfully written!");
 				setExpenseAmount("");
 				setExpenseName("");
 				setIsSave(true);
