@@ -22,6 +22,7 @@ import classes from "../../styles/common.module.css";
 import { useSearchParams } from "react-router-dom";
 import { NO_DATA_ERR_MSG } from "../../utils/Constant";
 import categoryList from "../../utils/CategoryList";
+import * as Constant from "../../utils/Constant";
 
 
 const ExpenseList = (props) => {
@@ -38,11 +39,10 @@ const ExpenseList = (props) => {
 	const [category, setCategory] = useState();
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
-	const [currency, setCurrency] = useState("usd");
+	const [currency, setCurrency] = useState(Constant.CURRENCY[0]);
 	const [expenseKey, setExpenseKey] = useState(null);
 
 	useEffect(() => {
-
 		// Get the value of the 'date' parameter
     	const dateFromUrl = searchParams.get('date');
 		if(dateFromUrl) {
@@ -210,6 +210,7 @@ const ExpenseList = (props) => {
 				</Col>
 				<Col md={2} xs={8}>
 					<Form.Control
+						id="expense-date"
 						type="date"
 						value={expenseDate}
 						onChange={(e) => showExpenseForSelectedDate(e)}
@@ -335,15 +336,11 @@ const ExpenseList = (props) => {
 																		);
 																	}}
 																>
-																	<option value="usd">
-																		USD
-																	</option>
-																	<option value="khr">
-																		Riel
-																	</option>
-																	<option value="mmk">
-																		MMK
-																	</option>
+																	{
+																		Constant.CURRENCY.map((curr, idx) => (
+																			<option key={idx} value={curr}>{curr}</option>
+																		))
+																	}
 																</Form.Select>
 															</InputGroup>
 														</td>
@@ -379,7 +376,7 @@ const ExpenseList = (props) => {
 													<>
 														<td>{expense.category}</td>
 														<td>{expense.name}</td>
-														<td>{`${expense.amount}  (${expense.currency.toUpperCase()})`}</td>
+														<td>{`${expense.amount} ${expense.currency}`}</td>
 														<td>
 															<Button
 																variant="primary"
@@ -412,13 +409,6 @@ const ExpenseList = (props) => {
 													</>
 												)
 											}
-
-
-
-
-
-
-											
 										</tr>
 									);
 								})}

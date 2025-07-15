@@ -23,9 +23,10 @@ export const convertToUsd = (amount, currency) => {
             return 0;
         }
 
-        if (currency === "usd") {
+        // if it is $
+        if (currency === Constant.CURRENCY[0]) {
             return numericAmount;
-        } else if (currency === "khr") {
+        } else if (currency === Constant.CURRENCY[1]) {
             return numericAmount / Constant.KHR_TO_USD_RATE;
         }
         return 0;

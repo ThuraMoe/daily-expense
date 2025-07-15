@@ -4,7 +4,7 @@ import { NO_DATA_ERR_MSG } from "../../utils/Constant";
 import categoryList from "../../utils/CategoryList";
 import classes from "../../styles/common.module.css";
 
-const DailyExpenseSummary = ({summaryExpense, totalExpense, rangeTotal, onAction}) => {
+const DailyExpenseSummary = ({summaryExpense}) => {
     const navigate = useNavigate();
 
     // for no data colspan
@@ -14,28 +14,8 @@ const DailyExpenseSummary = ({summaryExpense, totalExpense, rangeTotal, onAction
 		navigate(`/?date=${date}`);
 	}
 
-    const categoryClickHandler = (category) => {
-        // state lifting to parent
-        onAction(category);
-    }
-
     return (
         <>
-            <Row>
-                <Col xs={12}>
-                    <div className={`${classes["category-click"]} ${classes["category-total"]}`} onClick={() => categoryClickHandler("")}>
-                        Total <br/> {rangeTotal} $
-                    </div>
-                    {totalExpense &&
-                        totalExpense.map((cat, idx) => {
-                            return (
-                                <div className={classes["category-click"]} key={idx} onClick={() => categoryClickHandler(cat.category)}>
-                                    {cat.category} <br/> {cat.totalAmount} $
-                                </div>
-                            )
-                        })}
-                </Col>
-            </Row>
             <Row>
                 <Col xs={12}>
                     <Table striped bordered hover responsive>
@@ -43,8 +23,8 @@ const DailyExpenseSummary = ({summaryExpense, totalExpense, rangeTotal, onAction
                             <tr>
                                 <th>Date</th>
                                 <th>Total</th>
-                                {categoryList.map((category) => (
-                                    <th>{category}</th>
+                                {categoryList.map((category, idx) => (
+                                    <th key={idx}>{category}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -55,8 +35,8 @@ const DailyExpenseSummary = ({summaryExpense, totalExpense, rangeTotal, onAction
                                 </tr>
                             )}
                             {summaryExpense &&
-                                summaryExpense.map((expense) => (
-                                    <tr key={expense.date}>
+                                summaryExpense.map((expense, idx) => (
+                                    <tr key={idx}>
                                         <td>
                                             <div className={classes["date-click"]} onClick={() => dateDetailHandler(expense.date)}>
                                                 {expense.date}

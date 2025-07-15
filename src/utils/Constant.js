@@ -2,6 +2,7 @@
  * Number related constants
  */
 export const KHR_TO_USD_RATE = 4000;
+export const CURRENCY = ["$", "៛" , "Ks"];
 
 /**
  * Error Messages

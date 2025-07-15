@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDatabase, ref, set, push } from "firebase/database";
 import {
-	Row,
-	Col,
 	Form,
 	Button,
 	Alert,
@@ -14,13 +12,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
 import app from "../../firebaseConfig";
 import categoryList from "../../utils/CategoryList";
+import * as Constant from "../../utils/Constant";
 
 const ExpenseForm = (props) => {
 	
 	const [category, setCategory] = useState(categoryList[0]);
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
-	const [currency, setCurrency] = useState("usd");
+	const [currency, setCurrency] = useState(Constant.CURRENCY[0]); // set $ as default
 	const [expenseDate, setExpenseDate] = useState(
 		dayjs().format("YYYY-MM-DD")
 	);
@@ -119,9 +118,11 @@ const ExpenseForm = (props) => {
 									setCurrency(e.target.value);
 								}}
 							>
-								<option value="usd">USD</option>
-								<option value="khr">Riel</option>
-								<option value="mmk">MMK</option>
+								{
+									Constant.CURRENCY.map((curr, idx) => (
+										<option key={idx} value={curr}>{curr}</option>
+									))
+								}
 							</Form.Select>
 						</InputGroup>
 					</Form.Group>

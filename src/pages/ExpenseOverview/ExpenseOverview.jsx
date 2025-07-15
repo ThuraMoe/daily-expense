@@ -16,14 +16,17 @@ import app from "../../firebaseConfig.js";
 import classes from "../../styles/common.module.css";
 import DailyExpenseSummary from "./DailyExpenseSummary.jsx";
 import categoryList from "../../utils/CategoryList.js";
+import CategoryExpenseDetails from "./CategoryExpenseDetails.jsx";
 
 const ExpenseOverview = () => {
-	const [fromDate, setFromDate] = useState(null);
-	const [toDate, setToDate] = useState(null);
+	const [fromDate, setFromDate] = useState("");
+	const [toDate, setToDate] = useState("");
 	const [summaryExpense, setSummaryExpense] = useState([]);
 	const [totalExpense, setTotalExpense] = useState([]);
 	const [rangeTotal, setRangeTotal] = useState(0);
 	const [filteredCategoryExpenses, setfilteredCategoryExpenses] = useState([]);
+	const [currentView, setCurrentView] = useState('daily');
+	const [activeCategory, setActiveCategory] = useState(null);
 
 	// to calculate from, to date when component start
 	useEffect(() => {
@@ -155,11 +158,16 @@ const ExpenseOverview = () => {
 		} else {
 			setSummaryExpense([]);
 		}
+
+		// set view to daily
+		setCurrentView('daily');
 	};
 
-	const categoryClickActionHandler = async (selectedCategory) => {
-		console.log("he is clicked ", selectedCategory);
+	const categoryClickHandler = async (selectedCategory) => {
 		const categoryToSearch = selectedCategory;
+
+		// set active category name
+		setActiveCategory(selectedCategory);
 
 		// show all category data for selected date
 		const db = getDatabase(app);
@@ -187,21 +195,21 @@ const ExpenseOverview = () => {
 			// extract only selected category data
 			const filteredData = [];
 			formattedData.forEach((data) => {
-				
 				for(const key in data) {
 					if(key !== 'date') {
 						const row = data[key];
-						if(row.category === categoryToSearch) {
-							console.log(row.category, " == ", categoryToSearch);
-							
-							filteredData.push([row, {date: data['date']}]);
+						if(row.category === categoryToSearch) {							
+							filteredData.push({date: data['date'], ...row});
 						}
 					}
 				}
 			});
 			console.log('final filtereddata ');
 			console.log(filteredData);
-			// setExpenses(filteredExpense);
+			setfilteredCategoryExpenses(filteredData);
+
+			// show category view
+			setCurrentView('category');
 		}
 	}
 
@@ -214,19 +222,21 @@ const ExpenseOverview = () => {
 					</Col>
 					<Col md={4} xs={8}>
 						<InputGroup size="sm" className="mb-3">
-							<InputGroup.Text id="inputGroup-sizing-sm">
+							<InputGroup.Text id="dateRangeLabel">
 								Date Range
 							</InputGroup.Text>
 							<Form.Control
+								id="fromDate"
 								aria-label="from"
-								aria-describedby="inputGroup-sizing-sm"
+								aria-describedby="dateRangeLabel"
 								type="date"
 								value={fromDate}
 								onChange={(e) => fromDateChangeHandler(e)}
 							/>
 							<Form.Control
+								id="toDate"
 								aria-label="to"
-								aria-describedby="inputGroup-sizing-sm"
+								aria-describedby="dateRangeLabel"
 								type="date"
 								value={toDate}
 								onChange={(e) => toDateChangeHandler(e)}
@@ -235,12 +245,34 @@ const ExpenseOverview = () => {
 					</Col>
 				</Row>
 				
-				<DailyExpenseSummary 
-					summaryExpense={summaryExpense} 
-					totalExpense={totalExpense} 
-					rangeTotal={rangeTotal} 
-					onAction={categoryClickActionHandler}
-				/>
+				<Row>
+					<Col xs={12}>
+						<div className={`${classes["category-click"]} ${classes["category-total"]}`} onClick={fetchExpenseByDateRange}>
+							Total <br/> {rangeTotal} $
+						</div>
+						{totalExpense &&
+							totalExpense.map((cat, idx) => {
+								const isActive = cat.category === activeCategory;
+								const itemClasses = `${classes["category-click"]} ${isActive ? classes["category-active"] : ''}`
+								return (
+									<div className={itemClasses} key={idx} onClick={() => categoryClickHandler(cat.category)}>
+										{cat.category} <br/> {cat.totalAmount} $
+									</div>
+								)
+							})
+						}
+					</Col>
+				</Row>
+
+				{
+					currentView == 'daily' ? (
+						<DailyExpenseSummary summaryExpense={summaryExpense} />
+					) : (
+						<CategoryExpenseDetails filteredExpenses={filteredCategoryExpenses} />
+					)
+				}
+				
+
 
 			</Container>
 		</>
