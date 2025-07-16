@@ -4,6 +4,7 @@ import ExpenseManagement from "./pages/ExpenseManagement/ExpensesManagement";
 import Layout from "./components/Layout/Layout";
 import Login from "./components/Auth/Login";
 import User from "./pages/Profile/User";
+import CategoryList from "./pages/Category/CategoryList";
 
 const router = createBrowserRouter([
 	{
@@ -12,6 +13,7 @@ const router = createBrowserRouter([
 		children: [
 			{ path: "/", element: <ExpenseManagement /> },
 			{ path: "/overview", element: <ExpenseOverview /> },
+			{ path: "/category", element: <CategoryList /> },
 			{ path: "/profile", element: <User /> }
 		],
 	},

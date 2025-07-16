@@ -33,7 +33,7 @@ const ExpenseList = (props) => {
 	const [expenseDate, setExpenseDate] = useState(
 		dayjs().format("YYYY-MM-DD")
 	);
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 
 	// get login user
 	const {currentUser} = useAuth();
@@ -239,7 +239,7 @@ const ExpenseList = (props) => {
 			</Row>
 			<Row>
 				<Col xs={12}>
-					<Table striped bordered hover>
+					<Table striped borderless hover>
 						<thead>
 							<tr>
 								<th>Category</th>
