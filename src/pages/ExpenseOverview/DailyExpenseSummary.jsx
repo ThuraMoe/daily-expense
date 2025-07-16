@@ -51,8 +51,8 @@ const DailyExpenseSummary = ({summaryExpense}) => {
                                                     const eachCategory = expense.sumByCategory[category];
                                                     const amount = eachCategory.total;
                                                     return (
-                                                        <td key={idx}>
-                                                            {amount > 0 ? `$${amount.toFixed(2)}` : "-"}{" "}
+                                                        <td key={idx} className={classes["align-center"]}>
+                                                            {amount > 0 ? `$${amount.toFixed(2)}` : " "}
                                                         </td>
                                                     );
                                                 }

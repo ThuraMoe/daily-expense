@@ -13,18 +13,19 @@ import { faFloppyDisk, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { app } from "../../firebaseConfig";
 import categoryList from "../../utils/CategoryList";
 import * as Constant from "../../utils/Constant";
+import { useAuth } from "../../context/AuthContext";
 
-const ExpenseForm = (props) => {
-	
+const ExpenseForm = (props) => {	
 	const [category, setCategory] = useState(categoryList[0]);
 	const [expenseName, setExpenseName] = useState("");
 	const [expenseAmount, setExpenseAmount] = useState("");
 	const [currency, setCurrency] = useState(Constant.CURRENCY[0]); // set $ as default
-	const [expenseDate, setExpenseDate] = useState(
-		dayjs().format("YYYY-MM-DD")
-	);
+	const [expenseDate, setExpenseDate] = useState(dayjs().format("YYYY-MM-DD"));
 	const [isSave, setIsSave] = useState(false);
 	const [show, setShow] = useState(false);
+
+	// get login user
+	const {currentUser} = useAuth();
 
 	useEffect(() => {
 		setShow(props.onModalOpen);
@@ -34,7 +35,7 @@ const ExpenseForm = (props) => {
 	const addExpenseHandler = async () => {
 		const db = getDatabase(app);
 		const newDocRef = push(
-			ref(db, `expenses/daily-expenses/${expenseDate}`)
+			ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}`)
 		);
 		set(newDocRef, {
 			name: expenseName,

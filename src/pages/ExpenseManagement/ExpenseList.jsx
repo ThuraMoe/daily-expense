@@ -23,6 +23,7 @@ import { useSearchParams } from "react-router-dom";
 import { NO_DATA_ERR_MSG } from "../../utils/Constant";
 import categoryList from "../../utils/CategoryList";
 import * as Constant from "../../utils/Constant";
+import { useAuth } from "../../context/AuthContext";
 
 
 const ExpenseList = (props) => {
@@ -34,6 +35,9 @@ const ExpenseList = (props) => {
 	);
 	const [searchParams, setSearchParams] = useSearchParams();
 
+	// get login user
+	const {currentUser} = useAuth();
+
 	// for editable part
 	const [editRowId, setEditRowId] = useState(null);
 	const [category, setCategory] = useState();
@@ -44,7 +48,7 @@ const ExpenseList = (props) => {
 
 	useEffect(() => {
 		// Get the value of the 'date' parameter
-    	const dateFromUrl = searchParams.get('date');
+		const dateFromUrl = searchParams.get('date');
 		if(dateFromUrl) {
 			setExpenseDate(dateFromUrl);
 		}
@@ -67,7 +71,7 @@ const ExpenseList = (props) => {
 
 	const getExpenses = async () => {
 		const db = getDatabase(app);
-		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}`);
+		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}`);
 		const snapshot = await get(expenseRef);
 		if (snapshot.exists() && snapshot.hasChildren()) {
 			const expenses = Object.entries(snapshot.val()).map(
@@ -119,7 +123,7 @@ const ExpenseList = (props) => {
 
 		// show all category data for selected date
 		const db = getDatabase(app);
-		const expenseRef = ref(db, `expenses/daily-expenses/${expenseDate}`);
+		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}`);
 
 		// search by category query
 		const q = query(
@@ -158,10 +162,7 @@ const ExpenseList = (props) => {
 
 	const updateExpenseHandler = async () => {
 		const db = getDatabase(app);
-		const updateExpenseRef = ref(
-			db,
-			`expenses/daily-expenses/${expenseDate}/${expenseKey}`
-		);
+		const updateExpenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}/${expenseKey}`);
 
 		// updated data
 		const updatedData = {
@@ -187,10 +188,7 @@ const ExpenseList = (props) => {
 
 	const deleteHandler = async (key) => {
 		const db = getDatabase(app);
-		const expenseRef = ref(
-			db,
-			`expenses/daily-expenses/${expenseDate}/${key}`
-		);
+		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}/${key}`);
 		await remove(expenseRef, null);
 		getExpenses();
 	};

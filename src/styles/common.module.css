@@ -14,7 +14,7 @@
     padding-right: 0.5rem;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
-    margin: 0.75rem 0.25rem;
+    margin: 0.25rem 0.25rem;
 
     /* Font and Text Styling */
     font-weight: 600; /* font-semibold */
@@ -69,4 +69,12 @@
     font-style: italic;
     font-weight: bold;
     transition: all 0.8s ease-in-out;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.align-right {
+    text-align: right;
 }

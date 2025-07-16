@@ -2,6 +2,8 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import loginClass from "../../styles/login.module.css";
+import loginBackground from "../../assets/login-background-removebg.png";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -39,7 +41,15 @@ const Login = () => {
 
     return (
         <>
-            <Button onClick={signInWithGoogle}>SignIn With Google</Button>
+            <div className={loginClass.layout}>
+                <div className={loginClass.image}>
+                    <img src={loginBackground} width="250px" height="250px"/>
+                </div>
+                <div className={loginClass.app}>
+                    <div className={loginClass.title}>My Expenses</div>
+                    <Button onClick={signInWithGoogle}>SignIn With Google</Button>
+                </div>
+            </div>
         </>
     )
 }

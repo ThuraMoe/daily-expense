@@ -1,0 +1,19 @@
+.layout {
+    /* --- New styles for full screen width and height --- */
+    width: 100vw; /* Sets the width to 100% of the viewport width */
+    min-height: 100vh; /* Sets the minimum height to 100% of the viewport height */
+    display: flex; /* Use flexbox to center content */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
+    padding: 1rem; /* Add some padding to prevent content from touching edges on small screens */
+    box-sizing: border-box; /* Ensures padding is included in the total width/height */
+}
+
+.app {
+    text-align: center;
+}
+.title {
+    font-size: 4rem;
+    font-style: italic;
+    margin-bottom: 1rem;
+}

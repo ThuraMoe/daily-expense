@@ -1,23 +1,12 @@
 import { Container } from "react-bootstrap";
-import { useEffect, useState } from "react";
 import ExpenseForm from "./ExpenseForm";
 import ExpenseList from "./ExpenseList";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 
 const ExpenseManagement = () => {
-    const navigate = useNavigate();
-
-    const {currentUser, loading} = useAuth();
 	const [isOpen, setIsOpen] = useState(false);
 	const [isSave, setIsSave] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
-
-    useEffect(() => {
-        if(!currentUser) {
-            navigate("/login");
-        }
-    }, []);
 
 	const openExpenseModal = (dateFromChild) => {
         setSelectedDate(dateFromChild);

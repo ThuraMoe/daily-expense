@@ -15,6 +15,7 @@ import classes from "../../styles/common.module.css";
 import DailyExpenseSummary from "./DailyExpenseSummary.jsx";
 import categoryList from "../../utils/CategoryList.js";
 import CategoryExpenseDetails from "./CategoryExpenseDetails.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const ExpenseOverview = () => {
 	const [fromDate, setFromDate] = useState("");
@@ -25,6 +26,9 @@ const ExpenseOverview = () => {
 	const [filteredCategoryExpenses, setfilteredCategoryExpenses] = useState([]);
 	const [currentView, setCurrentView] = useState('daily');
 	const [activeCategory, setActiveCategory] = useState(null);
+
+	// get user data
+	const {currentUser} = useAuth();
 
 	// to calculate from, to date when component start
 	useEffect(() => {
@@ -73,7 +77,7 @@ const ExpenseOverview = () => {
 
 	const fetchExpenseByDateRange = async () => {
 		const db = getDatabase(app);
-		const expenseRef = ref(db, `expenses/daily-expenses`);
+		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses`);
 		const q = query(
 			expenseRef,
 			orderByKey(), // Order by the date keys
@@ -167,7 +171,7 @@ const ExpenseOverview = () => {
 
 		// show all category data for selected date
 		const db = getDatabase(app);
-		const expenseRef = ref(db, `expenses/daily-expenses`);
+		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses`);
 
 		// search by category query
 		const q = query(
@@ -212,8 +216,8 @@ const ExpenseOverview = () => {
 					<Col md={8} xs={12}>
 						<h3>Summary</h3>
 					</Col>
-					<Col md={4} xs={8}>
-						<InputGroup size="sm" className="mb-3">
+					<Col md={4} xs={12}>
+						<InputGroup className="mb-3">
 							<InputGroup.Text id="dateRangeLabel">
 								Date Range
 							</InputGroup.Text>
@@ -236,7 +240,6 @@ const ExpenseOverview = () => {
 						</InputGroup>
 					</Col>
 				</Row>
-				
 				<Row>
 					<Col xs={12}>
 						<div className={`${classes["category-click"]} ${classes["category-total"]}`} onClick={fetchExpenseByDateRange}>
@@ -255,7 +258,7 @@ const ExpenseOverview = () => {
 						}
 					</Col>
 				</Row>
-
+				<br/>
 				{
 					currentView == 'daily' ? (
 						<DailyExpenseSummary summaryExpense={summaryExpense} />
