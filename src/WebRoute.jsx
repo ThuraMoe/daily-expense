@@ -5,6 +5,7 @@ import Layout from "./components/Layout/Layout";
 import Login from "./components/Auth/Login";
 import User from "./pages/Profile/User";
 import CategoryList from "./pages/Category/CategoryList";
+import Analytic from "./pages/Analytic/Analytic";
 
 const router = createBrowserRouter([
 	{
@@ -13,6 +14,7 @@ const router = createBrowserRouter([
 		children: [
 			{ path: "/", element: <ExpenseManagement /> },
 			{ path: "/overview", element: <ExpenseOverview /> },
+			{ path: "/analytic", element: <Analytic /> },
 			{ path: "/category", element: <CategoryList /> },
 			{ path: "/profile", element: <User /> }
 		],

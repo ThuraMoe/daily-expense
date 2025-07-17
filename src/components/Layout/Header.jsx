@@ -33,6 +33,7 @@ const Header = () => {
 						<Nav.Link as={NavLink} to="/">Daily List</Nav.Link>
 						<Nav.Link as={NavLink} to="/overview">Overview</Nav.Link>
 						<Nav.Link as={NavLink} to="/category">Category</Nav.Link>
+						<Nav.Link as={NavLink} to="/analytic">Analytic</Nav.Link>
 					</Nav>
 					<Nav className="justify-content-end">
 						{

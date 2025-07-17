@@ -7,7 +7,7 @@ const CategoryExpenseDetails = ({filteredExpenses}) => {
         <>
             <Row>
                 <Col xs={12}>
-                    <Table striped bordered hover responsive>
+                    <Table striped borderless hover responsive>
                         <thead>
                             <tr>
                                 <th>Date</th>
