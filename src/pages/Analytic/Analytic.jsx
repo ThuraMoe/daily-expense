@@ -177,7 +177,7 @@ const Analytic = () => {
 			</Row>
 			<Row >
 				<Col xs="auto">
-					<h4 style={{color: "#e40202ff"}}>Total: ${totalExpenseAmount}</h4>
+					<h4 style={{color: "#e40202ff"}}>Total: ${totalExpenseAmount.toFixed(2)}</h4>
 				</Col>
 			</Row>
 			<Row>
