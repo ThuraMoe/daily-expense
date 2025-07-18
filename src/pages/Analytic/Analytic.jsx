@@ -184,8 +184,7 @@ const Analytic = () => {
 				<Col xs={6} md={6}>
 					<CategoryCostBarChart categoryExpense={categoryExpenseData}/>
 				</Col>
-			{/* </Row>
-			<Row> */}
+			
 				<Col xs={6} md={6}>
 					<DailyCostLineChart dailyExpenses={dailyExpenseData} />
 				</Col>
