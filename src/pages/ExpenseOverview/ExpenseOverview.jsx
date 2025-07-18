@@ -32,28 +32,11 @@ const ExpenseOverview = () => {
 
 	// to calculate from, to date when component start
 	useEffect(() => {
-		// calculate from, to date
-		calculateFromToDate();
+		// calculate 26(prev month) to 25(current month)
+		const [from, to] = Utils.calculateFromToDate();
+		setFromDate(from);
+		setToDate(to);
 	}, []);
-
-	// calculate 26(prev month) to 25(current month)
-	const calculateFromToDate = () => {
-		const now = new Date();
-
-		// calculate 26th of the previous month
-		const start = new Date(now.getFullYear(), now.getMonth() - 1, 26);
-
-		// calculate 25th of the current month
-		const end = new Date(now.getFullYear(), now.getMonth(), 25);
-
-		// convert to Y-m-d format
-		const stDate = Utils.dateFormatHelper(start);
-		const enDate = Utils.dateFormatHelper(end);
-
-		// set date as state
-		setFromDate(stDate);
-		setToDate(enDate);
-	};
 
 	// fetch data again when user changed the date
 	useEffect(() => {
