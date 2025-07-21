@@ -2,7 +2,7 @@ import { ResponsiveBar } from '@nivo/bar';
 import { customTheme } from './CustomTheme';
 
 // Custom Tooltip Component for Bar Chart
-const CustomBarTooltip = ({ value, indexValue, id }) => {
+const CustomBarTooltip = ({ value, indexValue }) => {
   return (
     <div
       className="bg-white p-2 rounded shadow-md"
@@ -22,7 +22,7 @@ const CustomBarTooltip = ({ value, indexValue, id }) => {
 
 const CategoryCostBarChart = ({ categoryExpense }) => {
     return (
-		<div style={{ width: "auto", height: "400px", overflow: "hidden" }}>
+		<div style={{ minWidth: 0, height: "400px", overflow: "hidden" }}>
             <ResponsiveBar
                 data={categoryExpense}
                 keys={['totalCost']} // <--- Key(s) for the bar values
@@ -65,30 +65,30 @@ const CategoryCostBarChart = ({ categoryExpense }) => {
                 theme={customTheme} // Apply your custom theme
                 // Tooltip customization
                 tooltip={CustomBarTooltip} // Use custom tooltip component
-                // legends={[
-                //     {
-                //         dataFrom: 'keys', // Legend data comes from the 'keys' prop
-                //         anchor: 'bottom-right',
-                //         direction: 'column',
-                //         justify: false,
-                //         translateX: 120,
-                //         translateY: 0,
-                //         itemsSpacing: 2,
-                //         itemWidth: 100,
-                //         itemHeight: 20,
-                //         itemDirection: 'left-to-right',
-                //         itemOpacity: 0.85,
-                //         symbolSize: 18,
-                //         effects: [
-                //         {
-                //             on: 'hover',
-                //             style: {
-                //             itemOpacity: 1,
-                //             },
-                //         },
-                //         ],
-                //     },
-                // ]}
+                /* legends={[
+                    {
+                        dataFrom: 'keys', // Legend data comes from the 'keys' prop
+                        anchor: 'bottom-right',
+                        direction: 'column',
+                        justify: false,
+                        translateX: 120,
+                        translateY: 0,
+                        itemsSpacing: 2,
+                        itemWidth: 100,
+                        itemHeight: 20,
+                        itemDirection: 'left-to-right',
+                        itemOpacity: 0.85,
+                        symbolSize: 18,
+                        effects: [
+                        {
+                            on: 'hover',
+                            style: {
+                            itemOpacity: 1,
+                            },
+                        },
+                        ],
+                    },
+                ]} */
             />
         </div>
     )

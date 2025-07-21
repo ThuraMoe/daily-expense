@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import categoryList from "../../utils/CategoryList";
 import DailyCostLineChart from "../../components/NivoChart/DailyCostLineChart";
 import CategoryCostBarChart from "../../components/NivoChart/CategoryCostBarChart";
+import CategoryCostPieChart from "../../components/NivoChart/CategoryCostPieChart";
 
 const Analytic = () => {
 	// calculate 26(prev month) to 25(current month)
@@ -15,6 +16,7 @@ const Analytic = () => {
 	const [toDate, setToDate] = useState(to);
 	const [dailyExpenseData, setDailyExpenseData] = useState([]);
 	const [categoryExpenseData, setCategoryExpenseData] = useState([]);
+	const [categoryExpenseForPie, setCategoryExpenseForPie] = useState([]);
 	const [totalExpenseAmount, setTotalExpenseAmount] = useState(0);
 
 	// get user data
@@ -121,7 +123,7 @@ const Analytic = () => {
 			]
 			setDailyExpenseData(prepareData);
 			
-			// convert the aggregated object to an array as requested
+			// convert the aggregated object to an array as requested for bar chart
 			let totalExpense = 0;
 			const colorsArray = ["#f58b00ff", "#ff5100ff", "#ff0800ff", "#ff4800ff", "#ff8c00ff", "#ff5e00ff"];
 			const totalExpenseForCategory = Object.values(totalExpenseByCategory).map((item) => {
@@ -133,9 +135,22 @@ const Analytic = () => {
 					color: randomColor
 				})}
 			).sort((a, b) => a.totalCost - b.totalCost);
-			
+			console.log(totalExpenseForCategory);
 			setCategoryExpenseData(totalExpenseForCategory);
 			setTotalExpenseAmount(totalExpense);
+
+			// convert the aggregated object data for pie chart
+			const dataForPieChart = Object.values(totalExpenseByCategory).map((item) => {
+				const randomColor = colorsArray[Math.floor(Math.random() * colorsArray.length)];
+				return ({
+					id: item.category,
+					label: item.category,
+					value: item.total.toFixed(2),
+					color: randomColor
+				});
+			}).sort((a, b) => a.value - b.value);
+			console.log(dataForPieChart);
+			setCategoryExpenseForPie(dataForPieChart);
 		} else {
 			setDailyExpenseData([]);
 			setCategoryExpenseData([]);
@@ -176,16 +191,19 @@ const Analytic = () => {
 				</Col>
 			</Row>
 			<Row >
-				<Col xs="auto">
+				<Col xs={12} md={6}>
 					<h4 style={{color: "#e40202ff"}}>Total: ${totalExpenseAmount.toFixed(2)}</h4>
+				</Col>
+				<Col xs={12} md={6}>
+					<CategoryCostPieChart data={categoryExpenseForPie} />
 				</Col>
 			</Row>
 			<Row>
-				<Col xs={6} md={6}>
+				<Col xs={12} md={6}>
 					<CategoryCostBarChart categoryExpense={categoryExpenseData}/>
 				</Col>
 			
-				<Col xs={6} md={6}>
+				<Col xs={12} md={6}>
 					<DailyCostLineChart dailyExpenses={dailyExpenseData} />
 				</Col>
 			</Row>

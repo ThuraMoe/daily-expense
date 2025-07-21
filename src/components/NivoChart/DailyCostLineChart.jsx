@@ -84,7 +84,7 @@ const DailyCostLineChart = ({ dailyExpenses }) => {
 	};
 
 	return (
-		<div style={{ width: "auto", height: "400px", overflow: "hidden" }}>
+		<div style={{ minWidth: 0, height: "400px", overflow: "hidden" }}>
 			<ResponsiveLine
 				data={dailyExpenses}
                 curve="cardinal"
