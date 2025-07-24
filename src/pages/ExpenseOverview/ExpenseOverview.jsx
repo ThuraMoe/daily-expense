@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as Utils from "../../utils/Utils.js";
-import { Col, InputGroup, Row, Form, Container, Table } from "react-bootstrap";
+import { Col, InputGroup, Row, Form, Container } from "react-bootstrap";
 import {
 	endAt,
 	get,
@@ -16,6 +16,7 @@ import DailyExpenseSummary from "./DailyExpenseSummary.jsx";
 import categoryList from "../../utils/CategoryList.js";
 import CategoryExpenseDetails from "./CategoryExpenseDetails.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+import DailyCostLineChart from "../../components/NivoChart/DailyCostLineChart.jsx";
 
 const ExpenseOverview = () => {
 	const [fromDate, setFromDate] = useState("");
@@ -26,6 +27,7 @@ const ExpenseOverview = () => {
 	const [filteredCategoryExpenses, setfilteredCategoryExpenses] = useState([]);
 	const [currentView, setCurrentView] = useState('daily');
 	const [activeCategory, setActiveCategory] = useState(null);
+	const [dailyExpenses, setDailyExpenses] = useState([]);
 
 	// get user data
 	const {currentUser} = useAuth();
@@ -131,12 +133,25 @@ const ExpenseOverview = () => {
 			});
 			setSummaryExpense(summaryByDate);
 			setRangeTotal(sumAllCategory.toFixed(2));
+
+			const dailyTotal = Object.values(summaryByDate).map((item) => ({
+				x: item.date,
+				y: `${item.subTotal}`
+			}));
+			console.log(dailyTotal);
+			const prepareData = [
+				{
+					id: "Total Cost",
+					data: dailyTotal
+				}
+			]
+			setDailyExpenses(prepareData);
 			
 			// convert the aggregated object to an array as requested
 			const totalExpenseForCategory = Object.values(totalExpenseByCategory).map((item) => ({
 				category: item.category,
 				totalAmount: parseFloat(item.total.toFixed(2)),
-			}));
+			})).sort((a, b) => b.totalAmount - a.totalAmount);
 			setTotalExpense(totalExpenseForCategory);
 		} else {
 			setSummaryExpense([]);
@@ -241,7 +256,11 @@ const ExpenseOverview = () => {
 						}
 					</Col>
 				</Row>
-				<br/>
+				<Row className="mb-4">
+					<Col xs={12}>
+						<DailyCostLineChart dailyExpenses={dailyExpenses} />
+					</Col>
+				</Row>
 				{
 					currentView == 'daily' ? (
 						<DailyExpenseSummary summaryExpense={summaryExpense} />

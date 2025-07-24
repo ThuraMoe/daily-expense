@@ -109,7 +109,7 @@ const Analytic = () => {
 			});
 			console.log(summaryByDate);
 			
-
+			// prepare data to show bar chart
 			const dailyTotal = Object.values(summaryByDate).map((item) => ({
 				x: item.date,
 				y: `${item.subTotal}`
@@ -192,7 +192,14 @@ const Analytic = () => {
 			</Row>
 			<Row >
 				<Col xs={12} md={6}>
-					<h4 style={{color: "#e40202ff"}}>Total: ${totalExpenseAmount.toFixed(2)}</h4>
+					<Card>
+						<Card.Body style={{borderColor: "#FF8C00"}}>
+							<Card.Title>Total</Card.Title>
+							<Card.Text style={{color: "#e40202ff"}}>
+								<h4>${totalExpenseAmount.toFixed(2)}</h4>
+							</Card.Text>
+						</Card.Body>
+					</Card>
 				</Col>
 				<Col xs={12} md={6}>
 					<CategoryCostPieChart data={categoryExpenseForPie} />

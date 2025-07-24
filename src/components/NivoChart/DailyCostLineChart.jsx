@@ -3,6 +3,7 @@ import { customTheme } from "./CustomTheme";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import classes from "../../styles/common.module.css";
 
 // Custom Tooltip Component
 // This component will receive 'slice' as props from Nivo
@@ -84,62 +85,65 @@ const DailyCostLineChart = ({ dailyExpenses }) => {
 	};
 
 	return (
-		<div style={{ minWidth: 0, height: "400px", overflow: "hidden" }}>
-			<ResponsiveLine
-				data={dailyExpenses}
-                curve="cardinal"
-				x="date"
-				y="total"
-				margin={{ top: 50, right: 60, bottom: 80, left: 70 }} // Adjust margins for labels
-				xScale={{
-					type: "time", // Important: specify 'time' for date data
-					format: "%Y-%m-%d", // Format of your date strings in data.x
-					precision: "day", // Granularity of your time data
-				}}
-				xFormat="time:%b %d, %Y" // How dates are displayed on the tooltip/axis
-				yScale={{
-					type: "linear",
-					min: "auto",
-					max: "auto",
-					stacked: false,
-					reverse: false,
-				}}
-				yFormat={(value) => `$${value.toFixed(2)}`}
-				axisTop={null}
-				axisRight={null}
-				axisBottom={{
-					format: "%b %d", // How dates are displayed on the bottom axis (e.g., "Jan 01")
-					tickValues: tickValues, // Show a tick every 2 days for 10 days
-					legend: "Date", // Label for the X-axis
-					legendOffset: 45,
-					legendPosition: "middle",
-					tickRotation: -45, // Rotate labels for better readability
-				}}
-				axisLeft={{
-					legend: "Total Cost ($)", // Label for the Y-axis
-					legendOffset: -60,
-					legendPosition: "middle",
-				}}
-				enablePoints={true} // Show points on the line
-				pointSize={8}
-				pointColor={["#ff5e00ff"]}
-				pointBorderWidth={2}
-				pointBorderColor={{ from: "serieColor" }}
-				useMesh={true} // Enables interactive mesh for tooltips
-				colors={["#ff8c00ff"]} //#ff8c00ff
-				lineWidth={3}
-				animate={true}
-				motionConfig="gentle"
-				// apply custom theme
-				theme={customTheme}
-				// add the shading under the line
-				enableArea={true} // Enables the area fill
-				areaOpacity={0.1} // Sets the opacity of the filled area (0 to 1)
-				enableSlices="x" // Ensure slices are enabled for sliceTooltip to work
-        		sliceTooltip={CustomSliceTooltip} // Pass custom tooltip component here
-				onClick={handlePointClick}
-			/>
+		<div className={classes["chart-container"]}>
+			<div style={{ minWidth: "600px", height: "400px", overflow: "hidden !important" }}>
+				<ResponsiveLine
+					data={dailyExpenses}
+					curve="cardinal"
+					x="date"
+					y="total"
+					margin={{ top: 50, right: 60, bottom: 80, left: 70 }} // Adjust margins for labels
+					xScale={{
+						type: "time", // Important: specify 'time' for date data
+						format: "%Y-%m-%d", // Format of your date strings in data.x
+						precision: "day", // Granularity of your time data
+					}}
+					xFormat="time:%b %d, %Y" // How dates are displayed on the tooltip/axis
+					yScale={{
+						type: "linear",
+						min: "auto",
+						max: "auto",
+						stacked: false,
+						reverse: false,
+					}}
+					yFormat={(value) => `$${value.toFixed(2)}`}
+					axisTop={null}
+					axisRight={null}
+					axisBottom={{
+						format: "%b %d", // How dates are displayed on the bottom axis (e.g., "Jan 01")
+						tickValues: tickValues, // Show a tick every 2 days for 10 days
+						legend: "Date", // Label for the X-axis
+						legendOffset: 45,
+						legendPosition: "middle",
+						tickRotation: -45, // Rotate labels for better readability
+					}}
+					axisLeft={{
+						legend: "Total Cost ($)", // Label for the Y-axis
+						legendOffset: -60,
+						legendPosition: "middle",
+					}}
+					enablePoints={true} // Show points on the line
+					pointSize={8}
+					pointColor={["#ff5e00ff"]}
+					pointBorderWidth={2}
+					pointBorderColor={{ from: "serieColor" }}
+					useMesh={true} // Enables interactive mesh for tooltips
+					colors={["#ff8c00ff"]} //#ff8c00ff
+					lineWidth={3}
+					animate={true}
+					motionConfig="gentle"
+					// apply custom theme
+					theme={customTheme}
+					// add the shading under the line
+					enableArea={true} // Enables the area fill
+					areaOpacity={0.1} // Sets the opacity of the filled area (0 to 1)
+					enableSlices="x" // Ensure slices are enabled for sliceTooltip to work
+					sliceTooltip={CustomSliceTooltip} // Pass custom tooltip component here
+					onClick={handlePointClick}
+				/>
+			</div>
 		</div>
+		
 	);
 };
 

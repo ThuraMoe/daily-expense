@@ -21,8 +21,13 @@ const CustomBarTooltip = ({ value, indexValue }) => {
 };
 
 const CategoryCostBarChart = ({ categoryExpense }) => {
-    return (
-		<div style={{ minWidth: 0, height: "400px", overflow: "hidden" }}>
+
+  const handleBarClick = (point) => {
+    console.log(point);
+  }
+
+  return (
+		<div style={{ minWidth: "300px", height: "400px", overflow: "hidden" }}>
             <ResponsiveBar
                 data={categoryExpense}
                 keys={['totalCost']} // <--- Key(s) for the bar values
@@ -65,6 +70,7 @@ const CategoryCostBarChart = ({ categoryExpense }) => {
                 theme={customTheme} // Apply your custom theme
                 // Tooltip customization
                 tooltip={CustomBarTooltip} // Use custom tooltip component
+				        onClick={handleBarClick}
                 /* legends={[
                     {
                         dataFrom: 'keys', // Legend data comes from the 'keys' prop
