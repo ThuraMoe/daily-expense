@@ -1,4 +1,4 @@
-import { Card, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import * as Utils from "../../utils/Utils";
 import { endAt, get, getDatabase, orderByKey, query, ref, startAt } from "firebase/database";
@@ -156,8 +156,6 @@ const Analytic = () => {
 			setCategoryExpenseData([]);
 			setTotalExpenseAmount(0);
 		}
-
-
 	};
 
 	return (
@@ -190,26 +188,25 @@ const Analytic = () => {
 					</InputGroup>
 				</Col>
 			</Row>
-			<Row >
-				<Col xs={12} md={6}>
-					<Card>
-						<Card.Body style={{borderColor: "#FF8C00"}}>
-							<Card.Title>Total</Card.Title>
-							<Card.Text style={{color: "#e40202ff"}}>
-								<h4>${totalExpenseAmount.toFixed(2)}</h4>
-							</Card.Text>
-						</Card.Body>
-					</Card>
+			<Row>
+				<Col xs={12} md={12}>
+					<Button>Daily</Button>
 				</Col>
-				<Col xs={12} md={6}>
+			</Row>
+			<Row >
+				<Col xs={12} md={12}>
 					<CategoryCostPieChart data={categoryExpenseForPie} />
+				</Col>
+			</Row>
+			<Row>
+				<Col xs={12}>
+					show comparison
 				</Col>
 			</Row>
 			<Row>
 				<Col xs={12} md={6}>
 					<CategoryCostBarChart categoryExpense={categoryExpenseData}/>
 				</Col>
-			
 				<Col xs={12} md={6}>
 					<DailyCostLineChart dailyExpenses={dailyExpenseData} />
 				</Col>
