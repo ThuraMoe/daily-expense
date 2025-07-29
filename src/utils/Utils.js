@@ -36,7 +36,6 @@ export const convertToUsd = (amount, currency) => {
  * Calculate prev month 26 to current month 25 based on current month
  * @returns array
  */
-
 export const calculateFromToDate = () => {
     const now = new Date();
 
@@ -52,3 +51,50 @@ export const calculateFromToDate = () => {
 
     return [stDate, enDate];
 };
+
+/**
+ * Get current month start and end date
+ */
+export const getCurrentMonthDateRange = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const monthIndex = today.getMonth();
+
+    // get first date
+    const start = new Date(year, monthIndex, 1);
+
+    // get last date
+    // By setting day to 0 of the *next* month, we get the last day of the *current* month.
+    const end = new Date(year, monthIndex + 1, 0);
+
+    // convert to Y-m-d format
+    const stDate = dateFormatHelper(start);
+    const enDate = dateFormatHelper(end);
+
+    return [stDate, enDate];
+}
+
+/**
+ * Get previous month start and end date
+ */
+export const getPreviousMonthDateRange = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const currentMonthIndex = today.getMonth();
+
+    // get previous month index
+    const prevMonthIndex = currentMonthIndex - 1;
+
+    // get start date
+    const start = new Date(year, prevMonthIndex, 1);
+
+    // get end date
+    // By setting day to 0 of the *current* month, we get the last day of the *previous* month.
+    const end = new Date(year, currentMonthIndex, 0);
+
+    // convert to Y-m-d format
+    const stDate = dateFormatHelper(start);
+    const enDate = dateFormatHelper(end);
+
+    return [stDate, enDate];
+}

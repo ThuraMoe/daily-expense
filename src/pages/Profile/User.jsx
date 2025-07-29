@@ -19,6 +19,11 @@ const User = () => {
                     {currentUser.email}
                 </Col>
             </Row>
+            <Row>
+                <Col xs={12}>
+                    <p>Which currencies will you use</p>
+                </Col>
+            </Row>
         </>
     )
 }

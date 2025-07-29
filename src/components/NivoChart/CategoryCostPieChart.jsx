@@ -7,10 +7,10 @@ const CategoryCostPieChart = ({data}) => {
     const [totalAmount, setTotalAmount] = useState(0);
 
     useEffect(() => {
-        console.log(data);
+        console.log('data inside piechart ', data);
         // Calculate the total value from your data
         const total = data.reduce((sum, item) => sum + parseFloat(item.value), 0);
-        console.log(total);
+        console.log('new total inside pie chart ', total);
         setTotalAmount(total);
 
     }, [data]);

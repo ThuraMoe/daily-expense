@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useEffect } from "react";
+import logo from "../../assets/new-logo.png";
 
 const Header = () => {
 	const navigate = useNavigate();
@@ -26,7 +27,9 @@ const Header = () => {
 	return (
 		<Navbar expand="lg" className="bg-body-tertiary">
 			<Container fluid>
-				<Navbar.Brand as={NavLink} to="/"><i>My Expenses</i></Navbar.Brand>
+				<Navbar.Brand as={NavLink} to="/">
+					<img src={logo} width="50px" height="40px"/>
+				</Navbar.Brand>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="me-auto">

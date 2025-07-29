@@ -35,7 +35,9 @@ const ExpenseOverview = () => {
 	// to calculate from, to date when component start
 	useEffect(() => {
 		// calculate 26(prev month) to 25(current month)
-		const [from, to] = Utils.calculateFromToDate();
+		// const [from, to] = Utils.calculateFromToDate();
+		// get current month start and end date
+		const [from, to] = Utils.getCurrentMonthDateRange();
 		setFromDate(from);
 		setToDate(to);
 	}, []);
