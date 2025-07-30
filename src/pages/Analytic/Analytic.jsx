@@ -1,10 +1,8 @@
 import {
 	Button,
-	Card,
 	Col,
 	Container,
 	Form,
-	InputGroup,
 	Row,
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
@@ -40,9 +38,7 @@ const Analytic = () => {
 	const [currentMonthTotal, setCurrentMonthTotal] = useState(0);
 
 	// previous month data
-	const [prevFrom, prevTo] = Utils.getPreviousMonthDateRange();
-	const [prevFromDate, setPrevFromDate] = useState(prevFrom);
-	const [prevToDate, setPrevToDate] = useState(prevTo);
+	const [prevFromDate, prevToDate] = Utils.getPreviousMonthDateRange();
 	const [prevMonthTotal, setPrevMonthTotal] = useState(0);
 
 	// get user data
@@ -59,12 +55,6 @@ const Analytic = () => {
 	const fromDateChangeHandler = (e) => {
 		if (e.target.value !== "") {
 			setFromDate(e.target.value);
-		}
-	};
-
-	const toDateChangeHandler = (e) => {
-		if (e.target.value !== "") {
-			setToDate(e.target.value);
 		}
 	};
 
@@ -96,6 +86,7 @@ const Analytic = () => {
 	};
 
 	const fetchPrevMonthExpenses = async () => {
+		const [prevFromDate, prevToDate] = Utils.getPrevMonthBasedOnSelectedDate(fromDate, toDate);
 		const expensesArray = await fetchDataWithRange(
 			prevFromDate,
 			prevToDate
@@ -248,31 +239,18 @@ const Analytic = () => {
 	return (
 		<Container>
 			<Row>
-				<Col md={8} xs={12}>
+				<Col md={10} xs={12}>
 					<h3>Analytics</h3>
 				</Col>
-				<Col md={4} xs={12}>
-					<InputGroup className="mb-3">
-						<InputGroup.Text id="dateRangeLabel">
-							Date Range
-						</InputGroup.Text>
-						<Form.Control
-							id="fromDate"
-							aria-label="from"
-							aria-describedby="dateRangeLabel"
-							type="date"
-							value={fromDate}
-							onChange={(e) => fromDateChangeHandler(e)}
-						/>
-						<Form.Control
-							id="toDate"
-							aria-label="to"
-							aria-describedby="dateRangeLabel"
-							type="date"
-							value={toDate}
-							onChange={(e) => toDateChangeHandler(e)}
-						/>
-					</InputGroup>
+				<Col md={2} xs={12}>
+					<Form.Control
+						id="fromDate"
+						aria-label="from"
+						aria-describedby="dateRangeLabel"
+						type="month"
+						value={fromDate}
+						onChange={(e) => fromDateChangeHandler(e)}
+					/>
 				</Col>
 			</Row>
 			<Row>

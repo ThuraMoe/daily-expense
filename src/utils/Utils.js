@@ -98,3 +98,32 @@ export const getPreviousMonthDateRange = () => {
 
     return [stDate, enDate];
 }
+
+/**
+ * Get previous month start and end date based on user selected
+ */
+export const getPrevMonthBasedOnSelectedDate = (startDateStr, endDateStr) => {
+
+    // make sure date string are valid
+    const start = new Date(startDateStr);
+    const end = new Date(endDateStr);
+
+    if(isNaN(start.getTime()) || isNaN(end.getTime())) {
+        console.log('Invalid date input for getPrevMonthBasedOnSelectedDate');
+        return [null, null];
+    }
+
+    // calculate previous month's start date
+    const prevFrom = new Date(start); // create a copy of date to avoid modifying original
+    prevFrom.setMonth(prevFrom.getMonth() - 1);
+
+    // calculate previous month's end date
+    const prevTo = new Date(end);
+    prevTo.setMonth(prevTo.getMonth() -1);
+
+    // convert to Y-m-d format
+    const prevFromDate = dateFormatHelper(prevFrom);
+    const prevToDate = dateFormatHelper(prevTo);
+
+    return [prevFromDate, prevToDate];
+}
