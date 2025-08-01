@@ -23,38 +23,34 @@ import DailyCostLineChart from "../../components/NivoChart/DailyCostLineChart";
 import CategoryCostBarChart from "../../components/NivoChart/CategoryCostBarChart";
 import CategoryCostPieChart from "../../components/NivoChart/CategoryCostPieChart";
 import MonthlyTotalComparison from "./MontlyTotalComparison";
+import dayjs from "dayjs";
 
 const Analytic = () => {
-	// calculate 26(prev month) to 25(current month)
-	// const [from, to] = Utils.calculateFromToDate();
 
-	// current month data
-	const [from, to] = Utils.getCurrentMonthDateRange();
-	const [fromDate, setFromDate] = useState(from);
-	const [toDate, setToDate] = useState(to);
+	const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
 	const [dailyExpenseData, setDailyExpenseData] = useState([]);
 	const [categoryExpenseData, setCategoryExpenseData] = useState([]);
 	const [categoryExpenseForPie, setCategoryExpenseForPie] = useState([]);
 	const [currentMonthTotal, setCurrentMonthTotal] = useState(0);
 
+	// categorize total comparison
+	const [selectedMonthCategorizedExpenses, setSelectedMonthCategorizedExpenses] = useState([]);
+	const [prevMonthCategorizedExpenses, setPrevMonthCategorizedExpenses] = useState([]);
+
 	// previous month data
-	const [prevFromDate, prevToDate] = Utils.getPreviousMonthDateRange();
 	const [prevMonthTotal, setPrevMonthTotal] = useState(0);
 
 	// get user data
 	const { currentUser } = useAuth();
 
 	useEffect(() => {
-		// need to fetch data when both date exists in correct
-		if (fromDate && toDate && fromDate < toDate) {
-			fetchCurrentMonthExpenses();
-			fetchPrevMonthExpenses();
-		}
-	}, [fromDate, toDate]);
+		fetchCurrentMonthExpenses();
+		fetchPrevMonthExpenses();
+	}, [selectedMonth]);
 
 	const fromDateChangeHandler = (e) => {
 		if (e.target.value !== "") {
-			setFromDate(e.target.value);
+			setSelectedMonth(e.target.value);
 		}
 	};
 
@@ -86,35 +82,50 @@ const Analytic = () => {
 	};
 
 	const fetchPrevMonthExpenses = async () => {
-		const [prevFromDate, prevToDate] = Utils.getPrevMonthBasedOnSelectedDate(fromDate, toDate);
-		const expensesArray = await fetchDataWithRange(
-			prevFromDate,
-			prevToDate
-		);
+		const [prevFromDate, prevToDate] = Utils.getPrevMonthBasedOnSelectedDate(selectedMonth);
+		console.log('previous start date is ', prevFromDate, ' and end date is ', prevToDate);
+		const expensesArray = await fetchDataWithRange(prevFromDate, prevToDate);
 		if (expensesArray.length > 0) {
 			let totalAmount = 0;
+
+			// Initialize aggregated expenses with 0 for all categories in categoryList
+			const cateorizedExpenses = [];
+			categoryList.forEach((category) => {
+				cateorizedExpenses[category] = {
+					category: category,
+					total: 0,
+				};
+			});
+
 			expensesArray.forEach((expense) => {
 				// iterate each item under the same date
 				for (const key in expense) {
 					// skip date key
 					if (key != "date") {
 						const expenseItem = expense[key];
+						const category = expenseItem.category;
 						const amount = expenseItem.amount;
 						const currency = expenseItem.currency;
-						const amountInUsd = Utils.convertToUsd(
-							amount,
-							currency
-						);
-
+						const amountInUsd = Utils.convertToUsd(amount, currency);
 						totalAmount += amountInUsd;
+
+						if(cateorizedExpenses.hasOwnProperty(category)) {
+							cateorizedExpenses[category].total += amountInUsd;
+						}
 					}
 				}
 			});
+			setPrevMonthCategorizedExpenses(cateorizedExpenses);
+			console.log('prev month categorize expense total', cateorizedExpenses);
 			setPrevMonthTotal(totalAmount.toFixed(2));
+		} else {
+			setPrevMonthTotal(0.00);
 		}
 	};
 
 	const fetchCurrentMonthExpenses = async () => {
+		const [fromDate, toDate] = Utils.getSelectedMonthDateRange(selectedMonth);
+		console.log('selected start date is ', fromDate, ' and end date is ', toDate);
 		const expensesArray = await fetchDataWithRange(fromDate, toDate);
 		if (expensesArray.length > 0) {
 			// Initialize aggregated expenses with 0 for all categories in categoryList
@@ -127,6 +138,7 @@ const Analytic = () => {
 			});
 
 			const summaryByDate = [];
+			let totalExpense = 0;
 			expensesArray.forEach((expense) => {
 				let totalCategoryExpense = 0;
 				const date = expense.date;
@@ -148,17 +160,14 @@ const Analytic = () => {
 						const category = expenseItem.category;
 						const amount = expenseItem.amount;
 						const currency = expenseItem.currency;
-						const amountInUsd = Utils.convertToUsd(
-							amount,
-							currency
-						);
+						const amountInUsd = Utils.convertToUsd(amount, currency);
+						totalExpense += amountInUsd;
 
 						// If the category doesn't exist in aggregatedExpenses yet, initialize it to 0.
 						// Then add the current expense amount. This handles all categories dynamically.
 						if (aggregatedExpenses.hasOwnProperty(category)) {
 							aggregatedExpenses[category].total += amountInUsd;
-							totalExpenseByCategory[category].total +=
-								amountInUsd;
+							totalExpenseByCategory[category].total += amountInUsd;
 							totalCategoryExpense += amountInUsd;
 						}
 					}
@@ -170,6 +179,9 @@ const Analytic = () => {
 					subTotal: totalCategoryExpense.toFixed(2),
 				});
 			});
+			setSelectedMonthCategorizedExpenses(totalExpenseByCategory)
+			setCurrentMonthTotal(totalExpense);
+
 
 			// prepare data to show bar chart
 			const dailyTotal = Object.values(summaryByDate).map((item) => ({
@@ -183,35 +195,6 @@ const Analytic = () => {
 				},
 			];
 			setDailyExpenseData(prepareData);
-
-			// convert the aggregated object to an array as requested for bar chart
-			let totalExpense = 0;
-			const colorsArray = [
-				"#f58b00ff",
-				"#ff5100ff",
-				"#ff0800ff",
-				"#ff4800ff",
-				"#ff8c00ff",
-				"#ff5e00ff",
-			];
-			const totalExpenseForCategory = Object.values(
-				totalExpenseByCategory
-			)
-				.map((item) => {
-					const randomColor =
-						colorsArray[
-							Math.floor(Math.random() * colorsArray.length)
-						];
-					totalExpense += parseFloat(item.total.toFixed(2));
-					return {
-						categoryName: item.category,
-						totalCost: parseFloat(item.total.toFixed(2)),
-						color: randomColor,
-					};
-				})
-				.sort((a, b) => a.totalCost - b.totalCost);
-			setCategoryExpenseData(totalExpenseForCategory);
-			setCurrentMonthTotal(totalExpense);
 
 			// convert the aggregated object data for pie chart
 			const dataForPieChart = Object.values(totalExpenseByCategory)
@@ -236,6 +219,39 @@ const Analytic = () => {
 		}
 	};
 
+	const categorizedExpenseComparison = () => {
+		const selectedMonthData = selectedMonthCategorizedExpenses;
+		const prevMonthData = prevMonthCategorizedExpenses;
+		console.log(selectedMonthData, prevMonthData);
+		// convert the aggregated object to an array as requested for bar chart
+		
+		const colorsArray = [
+			"#f58b00ff",
+			"#ff5100ff",
+			"#ff0800ff",
+			"#ff4800ff",
+			"#ff8c00ff",
+			"#ff5e00ff",
+		];
+		const totalExpenseForCategory = Object.values(
+			totalExpenseByCategory
+		)
+			.map((item) => {
+				const randomColor =
+					colorsArray[
+						Math.floor(Math.random() * colorsArray.length)
+					];
+				return {
+					categoryName: item.category,
+					totalCost: parseFloat(item.total.toFixed(2)),
+					color: randomColor,
+				};
+			})
+			.sort((a, b) => a.totalCost - b.totalCost);
+		console.log(totalExpenseForCategory);
+		setCategoryExpenseData(totalExpenseForCategory);
+	}
+
 	return (
 		<Container>
 			<Row>
@@ -248,7 +264,7 @@ const Analytic = () => {
 						aria-label="from"
 						aria-describedby="dateRangeLabel"
 						type="month"
-						value={fromDate}
+						value={selectedMonth}
 						onChange={(e) => fromDateChangeHandler(e)}
 					/>
 				</Col>
@@ -271,9 +287,7 @@ const Analytic = () => {
 			</Row>
 			<Row>
 				<Col xs={12} md={12}>
-					<CategoryCostBarChart
-						categoryExpense={categoryExpenseData}
-					/>
+					<CategoryCostBarChart categoryExpense={categoryExpenseData}/>
 				</Col>
 				<Col xs={12} md={12}>
 					<DailyCostLineChart dailyExpenses={dailyExpenseData} />

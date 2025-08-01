@@ -22,6 +22,27 @@ const CustomBarTooltip = ({ value, indexValue }) => {
 };
 
 const CategoryCostBarChart = ({ categoryExpense }) => {
+  categoryExpense =[
+      {
+          "categoryName": "Friends",
+          "prevMonth": 15,
+          "currentMonth": 40,
+          "color": "#ff8c00ff"
+      },
+      {
+          "categoryName": "Entertainment",
+          "prevMonth": 20.5,
+          "currentMonth": 85.7,
+          "color": "#f58b00ff"
+      },
+      {
+          "categoryName": "Bill",
+          "prevMonth": 22.77,
+          "currentMonth": 11,
+          "color": "#f58b00ff"
+      },
+      
+  ];
 
   const handleBarClick = (point) => {
     console.log(point);
@@ -32,9 +53,10 @@ const CategoryCostBarChart = ({ categoryExpense }) => {
       <div style={{ minWidth: "600px", height: "400px", overflow: "hidden" }}>
         <ResponsiveBar
             data={categoryExpense}
-            keys={['totalCost']} // <--- Key(s) for the bar values
+            keys={['prevMonth', 'currentMonth']} // <--- Key(s) for the bar values
             indexBy="categoryName" // <--- Field for categories (Y-axis in horizontal layout)
-            layout="horizontal" // <--- Set to horizontal layout
+            layout="vertical" // <--- Set to horizontal layout
+            groupMode="grouped"
             margin={{ top: 50, right: 130, bottom: 50, left: 100 }} // Adjusted left margin for long labels
             padding={0.25}
             valueScale={{ type: 'linear' }}
@@ -48,16 +70,16 @@ const CategoryCostBarChart = ({ categoryExpense }) => {
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: 'Total Cost ($)', // X-axis legend for horizontal layout
+                legend: 'Category', // X-axis legend for horizontal layout
                 legendPosition: 'middle',
                 legendOffset: 32,
-                format: (value) => `$${value.toFixed(0)}` // Format for bottom axis ticks
+                // format: (value) => `$${value.toFixed(0)}` // Format for bottom axis ticks
             }}
             axisLeft={{
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: 'Category', // Y-axis legend for horizontal layout
+                legend: 'Cost ($)', // Y-axis legend for horizontal layout
                 legendPosition: 'middle',
                 legendOffset: -80, // Adjusted offset for y-axis legend
             }}

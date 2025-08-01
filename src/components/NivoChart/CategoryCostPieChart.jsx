@@ -7,16 +7,42 @@ const CategoryCostPieChart = ({data}) => {
     const [totalAmount, setTotalAmount] = useState(0);
 
     useEffect(() => {
-        console.log('data inside piechart ', data);
-        // Calculate the total value from your data
-        const total = data.reduce((sum, item) => sum + parseFloat(item.value), 0);
-        console.log('new total inside pie chart ', total);
-        setTotalAmount(total);
+        // Ensure data is an array before reducing
+        if (!Array.isArray(data) || data.length === 0) {
+            console.log('Data is empty or not an array. Setting totalAmount to 0.');
+            setTotalAmount(0); // Explicitly set to 0 if data is empty or invalid
+            return; // Exit early
+        }
 
-    }, [data]);
+        // Calculate the total value from your data
+        const total = data.reduce((sum, item) => {
+            // Ensure item.value is a valid number
+            const value = parseFloat(item.value);
+            if (isNaN(value)) {
+                console.warn(`Invalid value encountered: ${item.value}. Skipping.`);
+                return sum;
+            }
+            return sum + value;
+        }, 0);
+
+        console.log('Calculated new total:', total);
+        // Only update state if the total has actually changed
+        // This is a micro-optimization and generally not strictly necessary
+        // as React handles re-renders efficiently, but it can make logs cleaner.
+        if (totalAmount !== total) {
+            setTotalAmount(total);
+        }
+
+    }, [data, totalAmount]);
 
     // Custom layer component
     const CenteredMetric = ({ centerX, centerY }) => {
+
+        // Use a safe fallback for formatting in case totalAmount isn't a number
+        const formattedTotal = typeof totalAmount === 'number'
+            ? totalAmount.toFixed(2).toLocaleString()
+            : '0.00'; // Default if totalAmount is not a number
+            
         return (
             <text
                 x={centerX}
@@ -43,7 +69,7 @@ const CategoryCostPieChart = ({data}) => {
                     y={centerY + 15} // Adjust this value to move the amount down
                     style={{ fontSize: '18px', fontWeight: 'bold' }} // Style for the amount
                 >
-                    ${totalAmount.toFixed(2).toLocaleString()} {/* Format the total as currency */}
+                    ${formattedTotal.toLocaleString()}
                 </tspan>
             </text>
         );
