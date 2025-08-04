@@ -43,10 +43,18 @@ const Analytic = () => {
 	// get user data
 	const { currentUser } = useAuth();
 
+	// to get selected month and previous month data
 	useEffect(() => {
 		fetchCurrentMonthExpenses();
 		fetchPrevMonthExpenses();
 	}, [selectedMonth]);
+
+	// prepare to compare in bar chart depend on each category
+	useEffect(() => {
+		if(selectedMonthCategorizedExpenses && prevMonthCategorizedExpenses) {
+			categorizedExpenseComparison();
+		}
+	}, [selectedMonthCategorizedExpenses, prevMonthCategorizedExpenses])
 
 	const fromDateChangeHandler = (e) => {
 		if (e.target.value !== "") {
@@ -197,6 +205,14 @@ const Analytic = () => {
 			setDailyExpenseData(prepareData);
 
 			// convert the aggregated object data for pie chart
+			const colorsArray = [
+				"#f58b00ff",
+				"#ff5100ff",
+				"#ff0800ff",
+				"#ff4800ff",
+				"#ff8c00ff",
+				"#ff5e00ff",
+			];
 			const dataForPieChart = Object.values(totalExpenseByCategory)
 				.map((item) => {
 					const randomColor =
@@ -222,9 +238,16 @@ const Analytic = () => {
 	const categorizedExpenseComparison = () => {
 		const selectedMonthData = selectedMonthCategorizedExpenses;
 		const prevMonthData = prevMonthCategorizedExpenses;
-		console.log(selectedMonthData, prevMonthData);
+		console.log('selected month ', selectedMonthData);
+		console.log('prev month ', prevMonthData);
 		// convert the aggregated object to an array as requested for bar chart
 		
+		/* {
+			"categoryName": "Friends",
+			"prevMonth": 15,
+			"currentMonth": 40,
+			"color": "#ff8c00ff"
+		}, */
 		const colorsArray = [
 			"#f58b00ff",
 			"#ff5100ff",
@@ -233,6 +256,23 @@ const Analytic = () => {
 			"#ff8c00ff",
 			"#ff5e00ff",
 		];
+
+		const compareData = selectedMonthData.map((item) => {
+			console.log('item ', item);
+			const currentCategory = item.category;
+			const prev = prevMonthData[currentCategory];
+			console.log('currentCategory ', currentCategory);
+			return {
+				"categoryName": currentCategory,
+				"prevMonth": prev.total,
+				"currentMonth": item.total,
+				"color": "orange"
+			}
+		});
+		console.log('compareData');
+		console.log(compareData);
+
+		/*
 		const totalExpenseForCategory = Object.values(
 			totalExpenseByCategory
 		)
@@ -249,7 +289,7 @@ const Analytic = () => {
 			})
 			.sort((a, b) => a.totalCost - b.totalCost);
 		console.log(totalExpenseForCategory);
-		setCategoryExpenseData(totalExpenseForCategory);
+		setCategoryExpenseData(totalExpenseForCategory); */
 	}
 
 	return (
