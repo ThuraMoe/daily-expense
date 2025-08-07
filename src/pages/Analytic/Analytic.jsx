@@ -28,6 +28,7 @@ import dayjs from "dayjs";
 const Analytic = () => {
 
 	const [selectedMonth, setSelectedMonth] = useState(dayjs().format("YYYY-MM"));
+	const [prevMonth, setPrevMonth] = useState(null);
 	const [dailyExpenseData, setDailyExpenseData] = useState([]);
 	const [categoryExpenseData, setCategoryExpenseData] = useState([]);
 	const [categoryExpenseForPie, setCategoryExpenseForPie] = useState([]);
@@ -91,9 +92,12 @@ const Analytic = () => {
 
 	const fetchPrevMonthExpenses = async () => {
 		const [prevFromDate, prevToDate] = Utils.getPrevMonthBasedOnSelectedDate(selectedMonth);
+		setPrevMonth(dayjs(prevFromDate).format('MMM, YYYY'));
 		console.log('previous start date is ', prevFromDate, ' and end date is ', prevToDate);
 		const expensesArray = await fetchDataWithRange(prevFromDate, prevToDate);
-		if (expensesArray.length > 0) {
+		console.log('expensesArray');
+		console.log(Object.keys(expensesArray).length);
+		if (Object.keys(expensesArray).length > 0) {
 			let totalAmount = 0;
 
 			// Initialize aggregated expenses with 0 for all categories in categoryList
@@ -128,6 +132,7 @@ const Analytic = () => {
 			setPrevMonthTotal(totalAmount.toFixed(2));
 		} else {
 			setPrevMonthTotal(0.00);
+			setPrevMonthCategorizedExpenses([]);
 		}
 	};
 
@@ -235,19 +240,16 @@ const Analytic = () => {
 		}
 	};
 
+	/**
+	 * Expense comparison based on category
+	 * This is data preparation for bar chart
+	 */
 	const categorizedExpenseComparison = () => {
 		const selectedMonthData = selectedMonthCategorizedExpenses;
 		const prevMonthData = prevMonthCategorizedExpenses;
-		console.log('selected month ', selectedMonthData);
-		console.log('prev month ', prevMonthData);
-		// convert the aggregated object to an array as requested for bar chart
 		
-		/* {
-			"categoryName": "Friends",
-			"prevMonth": 15,
-			"currentMonth": 40,
-			"color": "#ff8c00ff"
-		}, */
+		console.log('categorizedExpenseComparison selected Month ', selectedMonth, ' prev month ', prevMonth);
+
 		const colorsArray = [
 			"#f58b00ff",
 			"#ff5100ff",
@@ -257,39 +259,22 @@ const Analytic = () => {
 			"#ff5e00ff",
 		];
 
-		const compareData = selectedMonthData.map((item) => {
-			console.log('item ', item);
-			const currentCategory = item.category;
-			const prev = prevMonthData[currentCategory];
-			console.log('currentCategory ', currentCategory);
-			return {
-				"categoryName": currentCategory,
-				"prevMonth": prev.total,
-				"currentMonth": item.total,
-				"color": "orange"
-			}
-		});
-		console.log('compareData');
-		console.log(compareData);
+		const dataCompare = [];
+		for(const item in selectedMonthData) {
+			const current = selectedMonthData[item];
+			const prev = prevMonthData[item] ?? null;
 
-		/*
-		const totalExpenseForCategory = Object.values(
-			totalExpenseByCategory
-		)
-			.map((item) => {
-				const randomColor =
-					colorsArray[
-						Math.floor(Math.random() * colorsArray.length)
-					];
-				return {
-					categoryName: item.category,
-					totalCost: parseFloat(item.total.toFixed(2)),
-					color: randomColor,
-				};
+			// choose random color
+			const randomColor = colorsArray[Math.floor(Math.random() * colorsArray.length)];
+
+			dataCompare.push({
+				"categoryName": current.category,
+				[prevMonth]: prev ? (prev.total).toFixed(2) : '0.00',
+				[dayjs(selectedMonth).format('MMM, YYYY')]: (current.total).toFixed(2),
+				"color": randomColor
 			})
-			.sort((a, b) => a.totalCost - b.totalCost);
-		console.log(totalExpenseForCategory);
-		setCategoryExpenseData(totalExpenseForCategory); */
+		}
+		setCategoryExpenseData(dataCompare);
 	}
 
 	return (
@@ -327,7 +312,7 @@ const Analytic = () => {
 			</Row>
 			<Row>
 				<Col xs={12} md={12}>
-					<CategoryCostBarChart categoryExpense={categoryExpenseData}/>
+					<CategoryCostBarChart categoryExpense={categoryExpenseData} selectedMonth={dayjs(selectedMonth).format('MMM, YYYY')} prevMonth={prevMonth}/>
 				</Col>
 				<Col xs={12} md={12}>
 					<DailyCostLineChart dailyExpenses={dailyExpenseData} />
