@@ -15,10 +15,9 @@ const MonthlyTotalComparison = ({currentMonthTotal, prevMonthTotal}) => {
             const diff = currentMonthTotal - prevMonthTotal;
             const absDiff = Math.abs(diff);
             const percentageChange = (absDiff / prevMonthTotal) * 100;
-
             const formattedAbsDiff = absDiff.toFixed(2);
             setFormattedAbsDiff(formattedAbsDiff);
-            const formattedPercentage = percentageChange.toFixed(1);
+            const formattedPercentage = isNaN(percentageChange)? '0.0' : percentageChange.toFixed(1);
             setFormattedPercentage(formattedPercentage);
 
             // Determine trend and corresponding classes/text

@@ -53,6 +53,18 @@ export const calculateFromToDate = () => {
 };
 
 /**
+ * Check given argument is a valid date string
+ */
+export const isValidDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if(isNaN(date.getTime())) {
+        console.log("Given date string is invalid.");
+        return false;
+    }
+    return true;
+}
+
+/**
  * Get current month start and end date
  */
 export const getCurrentMonthDateRange = () => {
@@ -77,7 +89,7 @@ export const getCurrentMonthDateRange = () => {
 /**
  * Get previous month start and end date
  */
-export const getPreviousMonthDateRange = () => {
+/* export const getPreviousMonthDateRange = () => {
     const today = new Date();
     const year = today.getFullYear();
     const currentMonthIndex = today.getMonth();
@@ -97,29 +109,55 @@ export const getPreviousMonthDateRange = () => {
     const enDate = dateFormatHelper(end);
 
     return [stDate, enDate];
+} */
+
+/**
+ * Get selected month date range
+ */
+export const getSelectedMonthDateRange = (dateStr) => {
+    // if date format is wrong, error
+    if(!isValidDate(dateStr)) return false;
+
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const monthIndex = date.getMonth();
+
+    // get first date
+    const start = new Date(year, monthIndex, 1);
+
+    // get last date
+    // By setting day to 0 of the *next* month, we get the last day of the *current* month.
+    const end = new Date(year, monthIndex + 1, 0);
+
+    // convert to Y-m-d format
+    const stDate = dateFormatHelper(start);
+    const enDate = dateFormatHelper(end);
+
+    return [stDate, enDate];
 }
 
 /**
  * Get previous month start and end date based on user selected
  */
-export const getPrevMonthBasedOnSelectedDate = (startDateStr, endDateStr) => {
+export const getPrevMonthBasedOnSelectedDate = (dateStr) => {
+
+    // if date format is wrong, error
+    if(!isValidDate(dateStr)) return false;
 
     // make sure date string are valid
-    const start = new Date(startDateStr);
-    const end = new Date(endDateStr);
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const currentMonthIndex = date.getMonth();
 
-    if(isNaN(start.getTime()) || isNaN(end.getTime())) {
-        console.log('Invalid date input for getPrevMonthBasedOnSelectedDate');
-        return [null, null];
-    }
+    // get previous month index
+    const prevMonthIndex = currentMonthIndex - 1;
 
-    // calculate previous month's start date
-    const prevFrom = new Date(start); // create a copy of date to avoid modifying original
-    prevFrom.setMonth(prevFrom.getMonth() - 1);
+    // get first date
+    const prevFrom = new Date(year, prevMonthIndex, 1);
 
-    // calculate previous month's end date
-    const prevTo = new Date(end);
-    prevTo.setMonth(prevTo.getMonth() -1);
+    // get end date
+    // By setting day to 0 of the *current* month, we get the last day of the *previous* month.
+    const prevTo = new Date(year, currentMonthIndex, 0);
 
     // convert to Y-m-d format
     const prevFromDate = dateFormatHelper(prevFrom);

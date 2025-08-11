@@ -1,9 +1,10 @@
 import { ResponsiveBar } from '@nivo/bar';
 import { customTheme } from './CustomTheme';
 import classes from "../../styles/common.module.css";
+import { useEffect } from 'react';
 
 // Custom Tooltip Component for Bar Chart
-const CustomBarTooltip = ({ value, indexValue }) => {
+const CustomBarTooltip = ({ id, value, indexValue }) => {
   return (
     <div
       className="bg-white p-2 rounded shadow-md"
@@ -15,49 +16,58 @@ const CustomBarTooltip = ({ value, indexValue }) => {
         whiteSpace: 'nowrap',
       }}
     >
+      <div><span className="fw-bold">{id}</span></div>
       <div><span className="font-bold">Category:</span> {indexValue}</div>
       <div><span className="font-bold">Total Cost:</span> ${value.toFixed(2)}</div>
     </div>
   );
 };
 
-const CategoryCostBarChart = ({ categoryExpense }) => {
-
+const CategoryCostBarChart = ({ categoryExpense, selectedMonth, prevMonth }) => {
+  console.log('selected Month ', selectedMonth, ' prev month ', prevMonth);
   const handleBarClick = (point) => {
     console.log(point);
   }
 
+  useEffect(() => {
+    console.log('re-render everytime data is changes');
+  }, [categoryExpense, selectedMonth, prevMonth]);
+
   return (
     <div className={classes["chart-container"]}>
+      <h3>Expense Comparison</h3>
       <div style={{ minWidth: "600px", height: "400px", overflow: "hidden" }}>
         <ResponsiveBar
+            key={`${prevMonth}-${selectedMonth}`} // Adding a key prop forces a full re-render when the months change
             data={categoryExpense}
-            keys={['totalCost']} // <--- Key(s) for the bar values
+            keys={[prevMonth, selectedMonth]} // <--- Key(s) for the bar values
             indexBy="categoryName" // <--- Field for categories (Y-axis in horizontal layout)
-            layout="horizontal" // <--- Set to horizontal layout
+            layout="vertical" 
+            groupMode="grouped"
             margin={{ top: 50, right: 130, bottom: 50, left: 100 }} // Adjusted left margin for long labels
-            padding={0.25}
+            padding={0.1}
             valueScale={{ type: 'linear' }}
             indexScale={{ type: 'band', round: true }}
             // colors={"#ff8c00ff"}
             colors={{ datum: 'data.color' }} // Use the 'color' field from your data for bar colors
-            borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+            borderWidth={1.5}
+            borderColor="#130101ff"
             axisTop={null}
             axisRight={null}
             axisBottom={{
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: 'Total Cost ($)', // X-axis legend for horizontal layout
+                legend: 'Category', // X-axis legend for horizontal layout
                 legendPosition: 'middle',
                 legendOffset: 32,
-                format: (value) => `$${value.toFixed(0)}` // Format for bottom axis ticks
+                // format: (value) => `$${value.toFixed(0)}` // Format for bottom axis ticks
             }}
             axisLeft={{
                 tickSize: 5,
                 tickPadding: 5,
                 tickRotation: 0,
-                legend: 'Category', // Y-axis legend for horizontal layout
+                legend: 'Cost ($)', // Y-axis legend for horizontal layout
                 legendPosition: 'middle',
                 legendOffset: -80, // Adjusted offset for y-axis legend
             }}
