@@ -6,6 +6,7 @@ import Login from "./components/Auth/Login";
 import User from "./pages/Profile/User";
 import CategoryList from "./pages/Category/CategoryList";
 import Analytic from "./pages/Analytic/Analytic";
+import { ThemeProvider } from "./components/theme-provider";
 
 const router = createBrowserRouter([
 	{
@@ -26,7 +27,11 @@ const router = createBrowserRouter([
 	},
 ]);
 const WebRoute = () => {
-	return <RouterProvider router={router} />;
+	return (
+		<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+			<RouterProvider router={router} />
+		</ThemeProvider>
+	)
 };
 
 export default WebRoute;

@@ -13,12 +13,18 @@ services:
       
     # Mount the local project source code into the container
     volumes:
+      # Mount the host project directory to the container's /app directory
       - .:/app
-      - /app/node_modules # Keeps the container's node_modules separate from the host mount
+      # Explicitly declare a Docker volume for node_modules to prevent the 
+      # host's (potentially empty/wrong OS) modules from overwriting the container's
+      - /app/node_modules
       
-    # *** FIXED COMMAND: Add '-- --host' to tell Vite to listen on 0.0.0.0, allowing external connections. ***
-    # The '--' separates 'npm run dev' arguments from 'vite' arguments.
+    # *** CRITICAL FIX FOR HOT-RELOADING (HMR) ***
+    # This forces the file watcher (Chokidar, used by Vite) to poll the filesystem
+    # for changes, which is reliable across Docker volumes.
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      
     command: npm run dev -- --host 
     
-    # Restart the container if it fails
     restart: always
