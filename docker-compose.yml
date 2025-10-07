@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    # Build context points to the current directory where the Dockerfile is located
+    build: . 
+
+    container_name: daily-expense
+    
+    # *** FIXED PORT MAPPING: Use 5173 for both host and container as shown in Vite logs. ***
+    ports:
+      - "5173:5173"
+      
+    # Mount the local project source code into the container
+    volumes:
+      - .:/app
+      - /app/node_modules # Keeps the container's node_modules separate from the host mount
+      
+    # *** FIXED COMMAND: Add '-- --host' to tell Vite to listen on 0.0.0.0, allowing external connections. ***
+    # The '--' separates 'npm run dev' arguments from 'vite' arguments.
+    command: npm run dev -- --host 
+    
+    # Restart the container if it fails
+    restart: always
