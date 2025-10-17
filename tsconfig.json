@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
+    "moduleResolution": "node", // or "nodenext" for strict ESM environment
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true, // This makes noImplicitAny as true
@@ -13,6 +14,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
   }
 }

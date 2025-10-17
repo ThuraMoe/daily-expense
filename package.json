@@ -19,8 +19,13 @@
     "@nivo/core": "^0.99.0",
     "@nivo/line": "^0.99.0",
     "@nivo/pie": "^0.99.0",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/vite": "^4.1.14",
+    "add": "^2.0.6",
     "bootstrap": "^5.3.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -32,6 +37,8 @@
     "react-dom": "^19.0.0",
     "react-router-bootstrap": "^0.26.3",
     "react-router-dom": "^7.6.3",
+    "shadcn": "^3.4.2",
+    "sidebar": "^1.0.2",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

@@ -1,15 +1,9 @@
 # Use the official Node.js 22 LTS image (Slim variant - Debian-based) as the base
 # The slim variant often has a lower vulnerability count than the Alpine variant
-FROM node:22-slim
+FROM node:20-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
-
-# Security best practice: Update all installed packages using apt-get (Debian's package manager)
-# This mitigates known vulnerabilities in the base image's underlying OS (Debian).
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    rm -rf /var/lib/apt/lists/*
 
 # Copy the package.json and package-lock.json (or npm-shrinkwrap.json) files first.
 # This step is cached by Docker. If these files don't change, subsequent builds will be much faster.
