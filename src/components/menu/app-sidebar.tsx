@@ -8,6 +8,7 @@ import {
 	HandCoins,
 	TrendingUp,
 	Cog,
+	LogOut,
 } from "lucide-react";
 import {
 	Sidebar,
@@ -22,8 +23,8 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import logo from "@/assets/new-logo.png";
-import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "../ui/button";
 
 // Menu items.
 const items = [
@@ -70,14 +71,13 @@ const items = [
 ];
 
 export function AppSidebar() {
-	const { currentUser } = useAuth();
 	return (
 		<Sidebar>
-			<SidebarHeader>
-				<img src={logo} width={20} height={20}/>
+			<SidebarHeader className="flex flex-col items-center justify-center space-y-2 py-4">
+				<span>Daily Expense</span>
 				<Avatar>
-					<AvatarImage src={currentUser.photoURL} />
-					<AvatarFallback>CN</AvatarFallback>
+					<AvatarImage src="" />
+					<AvatarFallback>Avatar</AvatarFallback>
 				</Avatar>
 			</SidebarHeader>
 			<SidebarContent>
@@ -99,6 +99,16 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
+			<SidebarFooter className="flex flex-col items-center justify-center space-y-2 py-4">
+				<Button
+					variant="ghost"
+					className="w-full justify-start text-muted-foreground hover:text-foreground"
+					onClick={() => console.log("Logging out...")} 
+				>
+					<LogOut className="mr-3 h-4 w-4" />
+					Logout
+				</Button>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
