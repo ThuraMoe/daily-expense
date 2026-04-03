@@ -5,7 +5,7 @@
 `daily-expense` is a single-page personal expense tracking application. It lets authenticated users log expenses, categorize them, and review dashboard and analytics views over their own data.
 
 - Frontend stack: React 19, Vite 6, mixed TypeScript/JavaScript codebase (some files are `.tsx`/`.ts`, others still follow older JS-style patterns), React Router 7
-- UI stack: Tailwind CSS 4 (primary — all new components), React Bootstrap (legacy — being phased out gradually), shadcn/ui primitives, Radix UI, Lucide icons, Font Awesome
+- UI stack: Tailwind CSS 4 (primary - all new components), React Bootstrap (legacy - being phased out gradually), shadcn/ui primitives, Radix UI, Lucide icons, Font Awesome
 - Data and auth: Firebase Authentication, Firebase Realtime Database, Firebase Analytics
 - Charts and dates: Nivo charts, Day.js
 - Local runtime: Node.js, npm, Docker / Docker Compose
@@ -69,8 +69,8 @@ Do not invent or assume database paths beyond what is visible in existing code. 
 - Existing route, utility, and style naming is mixed; preserve nearby conventions when editing.
 - Path alias `@` maps to `src` and should be preferred where the file already uses it.
 - Keep components focused and local to the page unless the code is clearly reusable.
-- All new components must be written with Tailwind CSS only — do not use React Bootstrap for any new code.
-- Existing Bootstrap components are being phased out gradually — only migrate a Bootstrap component to Tailwind if it is within the scope of the current task.
+- All new components must be written with Tailwind CSS only - do not use React Bootstrap for any new code.
+- Existing Bootstrap components are being phased out gradually - only migrate a Bootstrap component to Tailwind if it is within the scope of the current task.
 - Do not rewrite Bootstrap components to Tailwind speculatively or as a "while I'm at it" improvement.
 - Favor small, explicit state and effect logic over broad refactors.
 - Every React component must have a JSDoc comment directly above it describing what it renders and its purpose.
@@ -142,7 +142,7 @@ The AI must never:
 - Refactor or rename anything outside the scope of the current task
 - Make "while I'm at it" improvements without asking first
 
-If the AI is unsure whether a change is in scope, it must ask — not assume.
+If the AI is unsure whether a change is in scope, it must ask - not assume.
 
 ## Workflow Rules
 
@@ -161,7 +161,7 @@ If the AI is unsure whether a change is in scope, it must ask — not assume.
 - Do not change Firebase project IDs, database URLs, or auth configuration without asking.
 - Do not switch authentication flow away from Firebase Google popup without asking.
 - Do not introduce a backend, ORM, or server API layer as part of routine frontend changes.
-- Do not use React Bootstrap for any new components — use Tailwind CSS instead.
+- Do not use React Bootstrap for any new components - use Tailwind CSS instead.
 - Do not rewrite React Bootstrap or shadcn/ui usage wholesale outside the scope of the current task.
 - Do not rename large groups of files to enforce naming purity.
 - Do not change the dev port without updating both Vite config and `docker-compose.yml`.

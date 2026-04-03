@@ -1,4 +1,4 @@
-# Decisions — `daily-expense`
+# Decisions - `daily-expense`
 
 This file records **why** things were built a certain way.
 Before refactoring or "improving" any of the patterns below, the AI must read this file and understand the reasoning. Do not reverse a decision without explicit instruction from the user.
@@ -39,14 +39,14 @@ Before refactoring or "improving" any of the patterns below, the AI must read th
 
 ## React Bootstrap is being replaced with Tailwind CSS (gradual migration)
 
-**Decision:** The project is migrating from React Bootstrap to Tailwind CSS 4. The migration is gradual — new components are written in Tailwind only, and existing Bootstrap components are converted when they are touched as part of a task.
+**Decision:** The project is migrating from React Bootstrap to Tailwind CSS 4. The migration is gradual - new components are written in Tailwind only, and existing Bootstrap components are converted when they are touched as part of a task.
 
 **Why:** Tailwind gives more control over styling, reduces bundle size from Bootstrap, and aligns better with the shadcn/ui components already in use.
 
 **Rules:**
-- All new components must use Tailwind only — no new Bootstrap usage
+- All new components must use Tailwind only - no new Bootstrap usage
 - Only migrate an existing Bootstrap component if it is directly in scope of the current task
-- Do not do speculative Bootstrap → Tailwind rewrites as cleanup
+- Do not do speculative Bootstrap -> Tailwind rewrites as cleanup
 
 **Do not:** Rewrite all Bootstrap components at once. Do not add new Bootstrap imports.
 
@@ -66,7 +66,7 @@ Before refactoring or "improving" any of the patterns below, the AI must read th
 
 **Decision:** The create expense form is a modal popup, not a separate page or inline form.
 
-**Why:** Faster UX — user stays in context of their current view. Consistent with mobile-friendly interaction patterns.
+**Why:** Faster UX - user stays in context of their current view. Consistent with mobile-friendly interaction patterns.
 
 **Do not:** Create a separate `/add-expense` route or render the form inline in the expense list.
 
@@ -101,13 +101,11 @@ Before refactoring or "improving" any of the patterns below, the AI must read th
 **Why:** On-device analysis would be too limited. A real LLM can give meaningful, contextual suggestions.
 
 **Rules:**
-- Only call the API when the user explicitly opens or refreshes the analytics page — do not call on every render
-- Never send personally identifiable information to the API — only send aggregated category totals
+- Only call the API when the user explicitly opens or refreshes the analytics page - do not call on every render
+- Never send personally identifiable information to the API - only send aggregated category totals
 - Handle API errors gracefully with a user-facing message
 
 ---
-
-
 
 **Decision:** There are no unit tests, integration tests, or test configuration files in this project.
 
@@ -117,4 +115,4 @@ Before refactoring or "improving" any of the patterns below, the AI must read th
 
 ---
 
-> ⚠️ If you think a decision here should be changed, say so and explain why — do not silently reverse it.
+> Warning: If you think a decision here should be changed, say so and explain why - do not silently reverse it.
