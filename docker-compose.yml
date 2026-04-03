@@ -7,9 +7,9 @@ services:
 
     container_name: daily-expense
     
-    # *** FIXED PORT MAPPING: Use 5173 for both host and container as shown in Vite logs. ***
+    # Use the configured Vite port for both host and container.
     ports:
-      - "5173:5173"
+      - "43177:43177"
       
     # Mount the local project source code into the container
     volumes:

@@ -16,8 +16,8 @@ RUN npm install
 # Copy the rest of the application source code
 COPY . .
 
-# Expose the default port for React development (3000)
-EXPOSE 3000
+# Expose the configured Vite dev server port
+EXPOSE 43177
 
 # Default command to run the application in development mode
 # This assumes your package.json has a "start" script that runs the dev server.
