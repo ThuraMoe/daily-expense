@@ -43,22 +43,22 @@ The AI must not reuse old code unless the human explicitly says so.
 ## Phase 1 - Foundation
 
 ### TASK-001 - Project Cleanup & Setup Verification
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Clean the existing codebase down to a known good starting point. Verify all tooling works before writing any new code.
 **Steps:**
-- [ ] Review existing folder structure with human - agree what to keep vs remove
-- [ ] Remove old page components, old routes, and unused files - show list and get approval before deleting anything
-- [ ] Verify Tailwind CSS 4 is correctly configured and working
-- [ ] Verify Firebase config is working (`src/firebaseConfig.ts`)
-- [ ] Verify Vite dev server runs correctly on port `43177`
-- [ ] Verify Docker setup still works
-- [ ] Review `package.json` - show list of potentially unused dependencies and ask before removing any
-- [ ] Confirm folder structure matches what is documented in `AI.md`
+- [x] Review existing folder structure with human - agree what to keep vs remove
+- [x] Remove old page components, old routes, and unused files - show list and get approval before deleting anything
+- [x] Verify Tailwind CSS 4 is correctly configured and working
+- [x] Verify Firebase config is working (`src/firebaseConfig.ts`)
+- [x] Verify Vite dev server runs correctly on port `43177`
+- [x] Verify Docker setup still works
+- [x] Review `package.json` - show list of potentially unused dependencies and ask before removing any
+- [x] Confirm folder structure matches what is documented in `AI.md`
 
 ---
 
 ### TASK-002 - App Shell & Layout
-**Status:** `NOT_STARTED`
+**Status:** `IN_PROGRESS`
 **Description:** Build the main layout wrapper that every page will live inside. This includes the outer shell, sidebar or top navigation skeleton, and the content area. No real pages yet - just the frame.
 **Steps:**
 - [ ] Agree on navigation style with human (sidebar vs top nav vs bottom nav for mobile)

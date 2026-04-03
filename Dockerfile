@@ -20,5 +20,4 @@ COPY . .
 EXPOSE 43177
 
 # Default command to run the application in development mode
-# This assumes your package.json has a "start" script that runs the dev server.
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev", "--", "--host"]

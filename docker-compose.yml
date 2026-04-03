@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     # Build context points to the current directory where the Dockerfile is located
