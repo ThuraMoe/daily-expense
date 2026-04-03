@@ -58,20 +58,19 @@ The AI must not reuse old code unless the human explicitly says so.
 ---
 
 ### TASK-002 - App Shell & Layout
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 **Description:** Build the main layout wrapper that every page will live inside. This includes the outer shell, sidebar or top navigation skeleton, and the content area. No real pages yet - just the frame.
 **Steps:**
-- [ ] Agree on navigation style with human (sidebar vs top nav vs bottom nav for mobile)
-- [ ] Build layout component in `src/layout/` using Tailwind only
-- [ ] Set up responsive behavior - must work on mobile browser and desktop
-- [ ] Add placeholder content area where pages will render
-- [ ] Wire layout into `src/App.tsx`
-- [ ] Verify layout renders correctly at mobile and desktop sizes
-
+- [x] Agree on navigation style with human (sidebar vs top nav vs bottom nav for mobile)
+- [x] Build layout component in `src/layout/` using Tailwind only
+- [x] Set up responsive behavior - must work on mobile browser and desktop
+- [x] Add placeholder content area where pages will render
+- [x] Wire layout into `src/App.tsx`
+- [x] Verify layout renders correctly at mobile and desktop sizes
 ---
 
 ### TASK-003 - Routing Structure
-**Status:** `NOT_STARTED`
+**Status:** `IN_PROGRESS`
 **Description:** Define all app routes in one place. No page content yet - just route definitions with placeholder pages so navigation works end to end.
 **Steps:**
 - [ ] List all planned pages with human and agree on route paths
@@ -332,3 +331,6 @@ The AI must not reuse old code unless the human explicitly says so.
 ---
 
 > Warning: Do not start a task that is not listed here without the user adding it first. If the user asks for something not in this file, ask them to add it before proceeding.
+
+
+
