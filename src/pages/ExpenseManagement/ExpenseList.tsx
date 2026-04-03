@@ -13,7 +13,7 @@ import {
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Alert, Button, Form, InputGroup, Modal } from "react-bootstrap";
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faFilePen, faFloppyDisk, faSquarePlus, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -45,6 +45,9 @@ const ExpenseList = (props) => {
 	const [expenseAmount, setExpenseAmount] = useState("");
 	const [currency, setCurrency] = useState(Constant.CURRENCY[0]);
 	const [expenseKey, setExpenseKey] = useState(null);
+	const [deleteExpenseKey, setDeleteExpenseKey] = useState(null);
+	const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+	const [deleteError, setDeleteError] = useState("");
 
 	useEffect(() => {
 		// Get the value of the 'date' parameter
@@ -186,11 +189,41 @@ const ExpenseList = (props) => {
 		setEditRowId(false);
 	};
 
-	const deleteHandler = async (key) => {
+	const openDeleteConfirmation = (key) => {
+		setDeleteExpenseKey(key);
+		setDeleteError("");
+	};
+
+	const closeDeleteConfirmation = () => {
+		if (isDeleteLoading) {
+			return;
+		}
+
+		setDeleteExpenseKey(null);
+		setDeleteError("");
+	};
+
+	const deleteHandler = async () => {
+		if (!deleteExpenseKey) {
+			return;
+		}
+
+		setIsDeleteLoading(true);
+		setDeleteError("");
+
 		const db = getDatabase(app);
-		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}/${key}`);
-		await remove(expenseRef, null);
-		getExpenses();
+		const expenseRef = ref(db, `expenses/users/${currentUser.uid}/daily-expenses/${expenseDate}/${deleteExpenseKey}`);
+
+		try {
+			await remove(expenseRef, null);
+			setDeleteExpenseKey(null);
+			getExpenses();
+		} catch (error) {
+			console.error("Error deleting expense: ", error);
+			setDeleteError("Unable to delete this expense. Please try again.");
+		} finally {
+			setIsDeleteLoading(false);
+		}
 	};
 
 	return (
@@ -387,7 +420,7 @@ const ExpenseList = (props) => {
 																variant="danger"
 																size="sm"
 																onClick={() =>
-																	deleteHandler(
+																	openDeleteConfirmation(
 																		expense.key
 																	)
 																}
@@ -407,6 +440,31 @@ const ExpenseList = (props) => {
 					</Table>
 				</Col>
 			</Row>
+			<Modal show={deleteExpenseKey !== null} onHide={closeDeleteConfirmation} centered>
+				<Modal.Header closeButton={!isDeleteLoading}>
+					<Modal.Title>Delete Expense</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p className="mb-3">Are you sure you want to delete this expense?</p>
+					{deleteError && <Alert variant="danger">{deleteError}</Alert>}
+				</Modal.Body>
+				<Modal.Footer>
+					<Button
+						variant="secondary"
+						onClick={closeDeleteConfirmation}
+						disabled={isDeleteLoading}
+					>
+						Cancel
+					</Button>
+					<Button
+						variant="danger"
+						onClick={deleteHandler}
+						disabled={isDeleteLoading}
+					>
+						{isDeleteLoading ? "Deleting..." : "Delete"}
+					</Button>
+				</Modal.Footer>
+			</Modal>
 		</>
 	);
 };

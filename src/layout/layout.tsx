@@ -3,7 +3,7 @@ import Header from "./Header";
 import { AppSidebar } from "@/components/menu/app-sidebar"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
-const Layout = ( {children}: {children: React.ReactNode} ) => {
+const Layout = () => {
 	return (
 		<>
 			{/* <Header />
@@ -15,7 +15,7 @@ const Layout = ( {children}: {children: React.ReactNode} ) => {
 				<AppSidebar />
 				<main>
 					<SidebarTrigger />
-					{children}
+					<Outlet />
 				</main>
 			</SidebarProvider>
 		</>
