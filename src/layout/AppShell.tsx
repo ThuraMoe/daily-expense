@@ -62,9 +62,11 @@ const AppShell = () => {
     .join("") || "GU";
 
   return (
-    <SidebarProvider defaultOpen>
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,#fff7ed_0%,#fffdf8_38%,#f8fafc_100%)] text-foreground">
-        <Sidebar collapsible="icon" variant="inset">
+    <SidebarProvider
+      defaultOpen
+      className="min-h-screen bg-[radial-gradient(circle_at_top,#fff7ed_0%,#fffdf8_38%,#f8fafc_100%)] text-foreground"
+    >
+        <Sidebar collapsible="icon" >
           <SidebarHeader className="gap-4 px-3 py-4">
             <div className="flex items-center gap-3 rounded-2xl bg-sidebar-primary/10 px-3 py-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
@@ -141,10 +143,9 @@ const AppShell = () => {
           <SidebarRail />
         </Sidebar>
 
-        <SidebarInset className="min-h-screen">
-          <div className="flex min-h-screen flex-col">
-            <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur">
-              <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <SidebarInset className="flex min-h-screen flex-1 flex-col overflow-hidden bg-transparent">
+          <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-white/50 px-4 backdrop-blur-md transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+              <div className="flex w-full items-center justify-between gap-4 px-4 py-3 sm:px-6">
                 <div className="flex items-center gap-3">
                   <SidebarTrigger className="h-10 w-10 rounded-xl border border-border/70" />
                   <div>
@@ -157,15 +158,15 @@ const AppShell = () => {
                   </div>
                 </div>
 
-                <Button className="rounded-xl px-4 shadow-sm">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Expense
+                <Button size="sm" className="rounded-xl px-3 shadow-sm sm:px-4">
+                  <PlusCircle className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Add Expense</span>
                 </Button>
               </div>
             </header>
 
-            <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8">
-              <section className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(20rem,0.8fr)]">
+            <main className="flex-1 overflow-y-auto p-4 md:p-6">
+              <section className="grid gap-4 md:grid-cols-[minmax(0,1.6fr)_minmax(18rem,0.8fr)]">
                 <article className="overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-sm">
                   <div className="border-b border-border/60 px-6 py-5">
                     <p className="text-sm font-semibold tracking-tight">
@@ -213,9 +214,7 @@ const AppShell = () => {
                 </aside>
               </section>
             </main>
-          </div>
         </SidebarInset>
-      </div>
     </SidebarProvider>
   );
 };
