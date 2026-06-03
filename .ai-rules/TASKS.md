@@ -189,15 +189,15 @@ The AI must not reuse old code unless the human explicitly says so.
 ## Phase 4 - Expense Views & Filtering
 
 ### TASK-011 - Expense Log View Tabs (Daily / Monthly / Yearly)
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Add tab-based view switching on the expense log page. Each tab groups and summarizes expenses differently.
 **Steps:**
-- [ ] Build tab switcher component (Daily / Monthly / Yearly) using Tailwind
-- [ ] Daily view: expenses grouped by day with daily totals
-- [ ] Monthly view: expenses grouped by month with monthly totals
-- [ ] Yearly view: expenses grouped by year with yearly totals
-- [ ] Each view shows total for all expenses and total per category
-- [ ] Handle empty states per view
+- [x] Build filter button (Daily / Monthly / Yearly / Custom range selection) using Tailwind
+- [x] Daily view: expenses grouped by day with daily totals
+- [x] Monthly view: expenses grouped by month with monthly totals
+- [x] Yearly view: expenses grouped by year with yearly totals
+- [x] Each view shows total for all expenses and total per category
+- [x] Handle empty states per view
 
 ---
 

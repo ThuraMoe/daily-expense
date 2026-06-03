@@ -5,6 +5,7 @@ import type { User } from "firebase/auth";
 import { useAuth } from "@/context/AuthContext";
 import { app } from "@/firebaseConfig";
 import categoryList from "@/utils/CategoryList";
+import { getCategoryMeta } from "@/utils/CategoryConfig";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -255,22 +256,30 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
 
           {/* Category */}
           <div>
-            <label htmlFor="expense-category" className={labelClass}>
-              Category
-            </label>
-            <select
-              id="expense-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              disabled={loading}
-              className={selectClass}
-            >
-              {categoryList.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+            <label className={labelClass}>Category</label>
+            <div className="flex flex-wrap gap-2">
+              {categoryList.map((cat) => {
+                const { color, Icon } = getCategoryMeta(cat);
+                const selected = category === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategory(cat)}
+                    disabled={loading}
+                    className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+                    style={
+                      selected
+                        ? { backgroundColor: `${color}20`, color, borderColor: color }
+                        : { borderColor: "transparent", backgroundColor: "var(--muted)", color: "var(--muted-foreground)" }
+                    }
+                  >
+                    <Icon size={12} style={{ color }} />
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Date */}
