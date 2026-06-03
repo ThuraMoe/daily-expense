@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import type { User } from "firebase/auth";
+import { Circle, CircleCheck, Pencil, Trash2 } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
 import { app } from "@/firebaseConfig";
+import AddExpenseModal from "@/components/AddExpenseModal";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Expense {
   id: string;
@@ -59,6 +69,7 @@ function groupByDate(expenses: Expense[]): { date: string; items: Expense[] }[] 
  *
  * Displays all expense records for the authenticated user, grouped by date with
  * the most recent date first. Shows loading, empty, and error states as appropriate.
+ * Provides an edit button on each record that opens AddExpenseModal pre-filled.
  *
  * @returns {JSX.Element} The expense list page.
  */
@@ -67,6 +78,10 @@ const Expenses = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -129,42 +144,164 @@ const Expenses = () => {
     );
   }
 
+  /**
+   * handleToggleActive
+   *
+   * Flips the active flag on an expense record in Firebase. Uses togglingId
+   * to disable the button on just that card while the write is in flight.
+   *
+   * @param {Expense} expense - The expense whose active state will be toggled.
+   */
+  const handleToggleActive = async (expense: Expense) => {
+    if (!currentUser) return;
+    setTogglingId(expense.id);
+    try {
+      const db = getDatabase(app);
+      const expenseRef = ref(
+        db,
+        `expenses/users/${currentUser.uid}/daily-expenses/${expense.date}/${expense.id}`
+      );
+      await update(expenseRef, { active: !expense.active });
+    } catch (err) {
+      console.error("Failed to toggle expense:", err);
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  /**
+   * handleDelete
+   *
+   * Removes the expense currently staged in deletingExpense from Firebase,
+   * then clears the confirmation dialog state. The onValue listener
+   * automatically reflects the removal in the rendered list.
+   */
+  const handleDelete = async () => {
+    if (!deletingExpense || !currentUser) return;
+    setDeleteLoading(true);
+    try {
+      const db = getDatabase(app);
+      const expenseRef = ref(
+        db,
+        `expenses/users/${currentUser.uid}/daily-expenses/${deletingExpense.date}/${deletingExpense.id}`
+      );
+      await remove(expenseRef);
+      setDeletingExpense(null);
+    } catch (err) {
+      console.error("Failed to delete expense:", err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const grouped = groupByDate(expenses);
 
   return (
-    <div className="p-4 md:p-6">
-      <h1 className="mb-6 text-xl font-semibold">Expenses</h1>
-      <div className="flex flex-col gap-6">
-        {grouped.map(({ date, items }) => (
-          <section key={date}>
-            <h2 className="mb-2 text-sm font-medium text-muted-foreground">
-              {formatDate(date)}
-            </h2>
-            <div className="flex flex-col gap-2">
-              {items.map((expense) => (
-                <div
-                  key={expense.id}
-                  className="rounded-xl border bg-card px-4 py-3 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-medium text-card-foreground">
-                      {expense.name}
+    <>
+      <div className="p-4 md:p-6">
+        <h1 className="mb-6 text-xl font-semibold">Expenses</h1>
+        <div className="flex flex-col gap-6">
+          {grouped.map(({ date, items }) => (
+            <section key={date}>
+              <h2 className="mb-2 text-sm font-medium text-muted-foreground">
+                {formatDate(date)}
+              </h2>
+              <div className="flex flex-col gap-2">
+                {items.map((expense) => (
+                  <div
+                    key={expense.id}
+                    className={`rounded-xl border bg-card px-4 py-3 shadow-sm transition-opacity ${expense.active === false ? "opacity-50" : ""}`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-medium text-card-foreground">
+                        {expense.name}
+                      </span>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="font-semibold text-card-foreground">
+                          {expense.currency}
+                          {expense.amount.toLocaleString()}
+                        </span>
+                        <button
+                          aria-label={expense.active === false ? "Mark active" : "Mark inactive"}
+                          onClick={() => handleToggleActive(expense)}
+                          disabled={togglingId === expense.id}
+                          className={`rounded-lg p-1 transition-colors disabled:opacity-50 ${expense.active === false ? "text-muted-foreground hover:bg-muted hover:text-foreground" : "text-green-500 hover:bg-green-500/10"}`}
+                        >
+                          {expense.active === false
+                            ? <Circle size={14} />
+                            : <CircleCheck size={14} />}
+                        </button>
+                        <button
+                          aria-label="Edit expense"
+                          onClick={() => setEditingExpense(expense)}
+                          className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          aria-label="Delete expense"
+                          onClick={() => setDeletingExpense(expense)}
+                          className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                    <span className="mt-1.5 inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
+                      {expense.category}
                     </span>
-                    <span className="shrink-0 font-semibold text-card-foreground">
-                      {expense.currency}
-                      {expense.amount.toLocaleString()}
-                    </span>
+                    {expense.note && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {expense.note}
+                      </p>
+                    )}
                   </div>
-                  <span className="mt-1.5 inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
-                    {expense.category}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
-    </div>
+
+      <AddExpenseModal
+        open={editingExpense !== null}
+        onClose={() => setEditingExpense(null)}
+        editExpense={editingExpense ?? undefined}
+      />
+
+      <Dialog
+        open={deletingExpense !== null}
+        onOpenChange={(isOpen) => { if (!isOpen && !deleteLoading) setDeletingExpense(null); }}
+      >
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete expense?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">
+              {deletingExpense?.name}
+            </span>{" "}
+            will be permanently removed. This cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeletingExpense(null)}
+              disabled={deleteLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? "Deleting…" : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

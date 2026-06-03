@@ -151,38 +151,38 @@ The AI must not reuse old code unless the human explicitly says so.
 ---
 
 ### TASK-008 - Edit Expense
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Allow user to edit an existing expense. Reuses the add expense modal with pre-filled values.
 **Steps:**
-- [ ] Add edit button to each expense list item
-- [ ] Open add expense modal pre-filled with existing expense data
-- [ ] Wire up Firebase update call on submit
-- [ ] Handle loading and error states
+- [x] Add edit button to each expense list item
+- [x] Open add expense modal pre-filled with existing expense data
+- [x] Wire up Firebase update call on submit
+- [x] Handle loading and error states
 - [ ] Verify edit works and updates the list correctly
 
 ---
 
 ### TASK-009 - Delete Expense
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Allow user to delete an expense with a confirmation step.
 **Steps:**
-- [ ] Add delete button to each expense list item
-- [ ] Show confirmation dialog before deleting (reuse shadcn/ui Dialog or Alert)
-- [ ] Wire up Firebase delete call
-- [ ] Handle loading and error states
-- [ ] Remove expense from list on success
+- [x] Add delete button to each expense list item
+- [x] Show confirmation dialog before deleting (reuse shadcn/ui Dialog or Alert)
+- [x] Wire up Firebase delete call
+- [x] Handle loading and error states
+- [x] Remove expense from list on success
 
 ---
 
 ### TASK-010 - Active/Inactive Toggle per Expense
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Add a toggle to each expense to include or exclude it from total calculations. Inactive expenses stay in the database but are excluded from all totals.
 **Steps:**
-- [ ] Add toggle button to each expense list item
-- [ ] Wire up Firebase update to set `active: true/false`
-- [ ] Show inactive expenses visually distinct (greyed out)
-- [ ] Ensure all total calculation logic filters by `active: true`
-- [ ] Handle toggle loading and error state
+- [x] Add toggle button to each expense list item
+- [x] Wire up Firebase update to set `active: true/false`
+- [x] Show inactive expenses visually distinct (greyed out)
+- [x] Ensure all total calculation logic filters by `active: true`
+- [x] Handle toggle loading and error state
 
 ---
 

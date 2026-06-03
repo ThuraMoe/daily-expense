@@ -24,23 +24,22 @@ When starting a new session, the AI must read this file first to understand the 
 
 ## Current State
 
-**Last updated:** 2026-06-02
-**Active task:** TASK-006 - Add Expense Modal
+**Last updated:** 2026-06-03
+**Active task:** TASK-011 - Expense Log View Tabs (Daily / Monthly / Yearly)
 
 **What was done last session:**
-- Completed TASK-004: rewrote `src/pages/Login.tsx` with Google sign-in button, loading state, and error state using `signInWithPopup` + `GoogleAuthProvider`
-- Completed TASK-005: added sign-out button to `AppShell.tsx` footer, wired sidebar nav items to routes via `NavLink`, removed TASK-002 placeholder header text, fixed `App.tsx` to render `WebRoute` instead of `AppShell` directly (was causing NavLink Router context error)
-- Added `CLAUDE.md` at project root — Claude Code now auto-reads all `.ai-rules/` files on session start
-- Added `.claude/commands/` with `/create-prd`, `/generate-tasks`, `/process-task-list` slash commands
+- Completed TASK-010: CircleCheck/Circle toggle button (green active, grey inactive), Firebase update() flips active field, inactive cards at opacity-50, togglingId disables only the toggled card while write is in-flight; note field shown below category badge; backfill effect wrote missing active/note fields to existing records then was removed
 
 **What to do next session:**
-- Start **TASK-006** (Add Expense Modal)
-- Build modal wrapper using shadcn/ui Dialog, expense form with fields: name, amount, currency, category, date, note
-- Wire Firebase write to `/expenses/users/{uid}/daily-expenses/{YYYY-MM-DD}/{expenseId}`
-- Trigger modal from the Add Expense button already in the app shell header
+- Start **TASK-011** (Expense Log View Tabs — Daily / Monthly / Yearly)
+- Build tab switcher (Daily / Monthly / Yearly) using Tailwind
+- Daily view: expenses grouped by day with daily totals
+- Monthly view: expenses grouped by month with monthly totals
+- Yearly view: expenses grouped by year with yearly totals
+- Each view shows total for all expenses and total per category
+- Handle empty states per view
 
 **Loose ends / warnings:**
-- `AppShell.tsx` still renders TASK-002 placeholder content instead of `<Outlet />` — routed pages do not render yet. Fix this as part of TASK-006 or before, not as a standalone task
 - Build passes, but the main client bundle is above 500 kB and may need code-splitting later
 - Legacy code still exists under `src/legacy/` - treat it as reference only, not as a base
 - Port `43177` may already be occupied by another local process during dev checks
@@ -59,6 +58,9 @@ When starting a new session, the AI must read this file first to understand the 
 | 7 | 2026-04-03 | Completed TASK-002: built the new responsive app shell with a desktop sidebar, mobile drawer, header action area, and placeholder content panels | Start TASK-003 and wire routing into the new shell |
 | 8 | 2026-06-02 | Completed TASK-003: wired all routes in `src/WebRoute.tsx`, created placeholder pages for all 6 routes, added `ProtectedRoute` and `PublicRoute` guards | Start TASK-004 - Login Page |
 | 9 | 2026-06-02 | Completed TASK-004 and TASK-005: login page with Google sign-in, sign-out in sidebar, NavLink routing, fixed App.tsx to use WebRoute. Added CLAUDE.md and `/create-prd` `/generate-tasks` `/process-task-list` commands | Start TASK-006 - Add Expense Modal |
+| 10 | 2026-06-03 | Completed TASK-008: edit expense via AddExpenseModal — pencil button on each card, form pre-fill, Firebase update (in-place or date-change re-bucket), verified working | Start TASK-009 - Delete Expense |
+| 11 | 2026-06-03 | Completed TASK-009: Trash2 delete button on each card, shadcn/ui confirmation Dialog with expense name, Firebase remove() on date-bucketed path, loading lock on dialog | Start TASK-010 - Active/Inactive Toggle |
+| 12 | 2026-06-03 | Completed TASK-010: active/inactive toggle (green CircleCheck / grey Circle), Firebase update() on active field, opacity-50 for inactive cards, note field on cards, backfill effect for missing fields (removed after run) | Start TASK-011 - Expense Log View Tabs |
 
 ---
 

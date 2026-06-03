@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { getDatabase, push, ref, set } from "firebase/database";
+import { useEffect, useState } from "react";
+import { getDatabase, push, ref, remove, set, update } from "firebase/database";
 import type { User } from "firebase/auth";
 
 import { useAuth } from "@/context/AuthContext";
@@ -17,6 +17,17 @@ import {
 } from "@/components/ui/dialog";
 
 const CURRENCIES = ["$", "៛", "Ks"];
+
+interface Expense {
+  id: string;
+  date: string;
+  name: string;
+  amount: number;
+  currency: string;
+  category: string;
+  note: string;
+  active: boolean;
+}
 
 /**
  * getTodayDate
@@ -37,19 +48,25 @@ const getTodayDate = (): string => {
 interface AddExpenseModalProps {
   open: boolean;
   onClose: () => void;
+  editExpense?: Expense;
 }
 
 /**
  * AddExpenseModal
  *
- * Modal form for adding a new expense record. Writes to Firebase Realtime
- * Database at /expenses/users/{uid}/daily-expenses/{YYYY-MM-DD}/{expenseId}.
- * Every record includes active: true so it is included in totals by default.
+ * Modal form for adding or editing an expense record. When editExpense is
+ * provided the form is pre-filled and submit runs a Firebase update instead
+ * of a push. If the date changes during edit the old record is removed and a
+ * new one is created at the correct date path.
  *
- * @param {AddExpenseModalProps} props - Modal visibility flag and close callback.
+ * Firebase path: /expenses/users/{uid}/daily-expenses/{YYYY-MM-DD}/{expenseId}
+ *
+ * @param {AddExpenseModalProps} props - Modal visibility, close callback, and optional expense to edit.
  */
-const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
+const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) => {
   const { currentUser } = useAuth() as unknown as { currentUser: User | null };
+
+  const isEditing = !!editExpense;
 
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -59,6 +76,22 @@ const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Populate form fields when opening in edit mode.
+  useEffect(() => {
+    if (open && editExpense) {
+      setName(editExpense.name);
+      setAmount(String(editExpense.amount));
+      setCurrency(editExpense.currency);
+      setCategory(editExpense.category);
+      setDate(editExpense.date);
+      setNote(editExpense.note ?? "");
+      setError(null);
+    } else if (open && !editExpense) {
+      resetForm();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editExpense]);
 
   /**
    * resetForm
@@ -88,8 +121,9 @@ const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
   /**
    * handleSubmit
    *
-   * Validates the form, writes the new expense record to Firebase, then
-   * closes the modal on success or surfaces an error message on failure.
+   * Validates the form then either creates a new expense (push + set) or
+   * updates an existing one. If the date changed during editing, the old
+   * record is deleted and a new one is written at the new date path.
    */
   const handleSubmit = async () => {
     if (!name.trim()) {
@@ -110,12 +144,7 @@ const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
 
     try {
       const db = getDatabase(app);
-      const dayRef = ref(
-        db,
-        `expenses/users/${currentUser.uid}/daily-expenses/${date}`
-      );
-      const newRef = push(dayRef);
-      await set(newRef, {
+      const payload = {
         name: name.trim(),
         amount: Number(amount),
         currency,
@@ -123,7 +152,39 @@ const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
         date,
         note: note.trim(),
         active: true,
-      });
+      };
+
+      if (isEditing && editExpense) {
+        if (date !== editExpense.date) {
+          // Date changed: remove from old bucket, create in new bucket.
+          const oldRef = ref(
+            db,
+            `expenses/users/${currentUser.uid}/daily-expenses/${editExpense.date}/${editExpense.id}`
+          );
+          await remove(oldRef);
+          const newDayRef = ref(
+            db,
+            `expenses/users/${currentUser.uid}/daily-expenses/${date}`
+          );
+          const newRef = push(newDayRef);
+          await set(newRef, payload);
+        } else {
+          // Same date: update fields in place.
+          const existingRef = ref(
+            db,
+            `expenses/users/${currentUser.uid}/daily-expenses/${editExpense.date}/${editExpense.id}`
+          );
+          await update(existingRef, payload);
+        }
+      } else {
+        const dayRef = ref(
+          db,
+          `expenses/users/${currentUser.uid}/daily-expenses/${date}`
+        );
+        const newRef = push(dayRef);
+        await set(newRef, payload);
+      }
+
       resetForm();
       onClose();
     } catch (err) {
@@ -142,7 +203,7 @@ const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Expense</DialogTitle>
+          <DialogTitle>{isEditing ? "Edit Expense" : "Add Expense"}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
@@ -258,7 +319,7 @@ const AddExpenseModal = ({ open, onClose }: AddExpenseModalProps) => {
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving…" : "Save"}
+            {loading ? (isEditing ? "Updating…" : "Saving…") : isEditing ? "Update" : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>
