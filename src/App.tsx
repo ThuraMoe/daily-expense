@@ -1,14 +1,14 @@
-import AppShell from "@/layout/AppShell";
+import WebRoute from "@/WebRoute";
 
 /**
  * App
  *
- * Renders the current rewrite application shell.
+ * Root application component. Delegates all routing and layout to WebRoute.
  *
- * @returns {JSX.Element} The root application content.
+ * @returns {JSX.Element} The application router.
  */
 const App = () => {
-  return <AppShell />;
+  return <WebRoute />;
 };
 
 export default App;

@@ -92,61 +92,61 @@ The AI must not reuse old code unless the human explicitly says so.
 ## Phase 2 - Authentication
 
 ### TASK-004 - Login Page
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Build the login page UI with Google sign-in button. Clean Tailwind design, mobile-friendly.
 **Steps:**
-- [ ] Build login page in `src/pages/Login/`
-- [ ] Add Google sign-in button using existing Firebase auth popup flow
-- [ ] Handle loading state while auth is in progress
-- [ ] Handle error state if sign-in fails
-- [ ] Redirect to `/` (dashboard) after successful login
-- [ ] If user is already logged in, redirect away from `/login` automatically
-- [ ] Verify on mobile browser
+- [x] Build login page in `src/pages/Login.tsx`
+- [x] Add Google sign-in button using existing Firebase auth popup flow
+- [x] Handle loading state while auth is in progress
+- [x] Handle error state if sign-in fails
+- [x] Redirect to `/` (dashboard) after successful login
+- [x] If user is already logged in, redirect away from `/login` automatically
+- [x] Verify on mobile browser
 
 ---
 
 ### TASK-005 - Auth State & Route Protection
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Ensure auth state is properly managed across the app. Protected routes redirect to login if not authenticated. Auth context provides user data to all pages.
 **Steps:**
-- [ ] Review existing `src/context/AuthContext.tsx` - update or rewrite if needed
-- [ ] Ensure auth state persists correctly across page refresh
-- [ ] Verify all protected routes redirect to `/login` when not authenticated
-- [ ] Verify `/login` redirects to `/` when already authenticated
-- [ ] Add sign-out functionality to navigation
+- [x] Review existing `src/context/AuthContext.tsx` - no changes needed, already correct
+- [x] Ensure auth state persists correctly across page refresh
+- [x] Verify all protected routes redirect to `/login` when not authenticated
+- [x] Verify `/login` redirects to `/` when already authenticated
+- [x] Add sign-out functionality to navigation
 
 ---
 
 ## Phase 3 - Core Expense Features
 
 ### TASK-006 - Add Expense Modal
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Build the add expense form as a modal popup. This is the primary way users enter data - get this right before building any list views.
 **Steps:**
-- [ ] Build modal wrapper using shadcn/ui Dialog or Radix UI Dialog - Tailwind only
-- [ ] Build expense form inside modal with fields: name, amount, currency, category, date, note (optional)
-- [ ] Populate category dropdown from `src/utils/CategoryList.ts`
-- [ ] Default date to today
-- [ ] Wire up Firebase write to `/expenses/users/{uid}/daily-expenses/{YYYY-MM-DD}/{expenseId}`
-- [ ] Add `active: true` field to every new expense record
-- [ ] Handle form validation, loading state, and error state
-- [ ] Close modal and refresh list on success
-- [ ] Trigger modal from a clearly visible add button in the app shell
+- [x] Build modal wrapper using shadcn/ui Dialog or Radix UI Dialog - Tailwind only
+- [x] Build expense form inside modal with fields: name, amount, currency, category, date, note (optional)
+- [x] Populate category dropdown from `src/utils/CategoryList.ts`
+- [x] Default date to today
+- [x] Wire up Firebase write to `/expenses/users/{uid}/daily-expenses/{YYYY-MM-DD}/{expenseId}`
+- [x] Add `active: true` field to every new expense record
+- [x] Handle form validation, loading state, and error state
+- [x] Close modal and refresh list on success
+- [x] Trigger modal from a clearly visible add button in the app shell
 - [ ] Verify modal works on mobile browser
 
 ---
 
 ### TASK-007 - Expense List Page
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Build the main expense log page showing a list of expenses. Basic list first - filters and views come later.
 **Steps:**
-- [ ] Build expense list page in `src/pages/Expenses/`
-- [ ] Read expenses from Firebase for the current user
-- [ ] Display each expense: name, amount, currency, category, date
-- [ ] Show loading state while data is fetching
-- [ ] Show empty state when no expenses exist
-- [ ] Show error state if Firebase read fails
-- [ ] Verify list renders correctly on mobile and desktop
+- [x] Build expense list page in `src/pages/Expenses/`
+- [x] Read expenses from Firebase for the current user
+- [x] Display each expense: name, amount, currency, category, date
+- [x] Show loading state while data is fetching
+- [x] Show empty state when no expenses exist
+- [x] Show error state if Firebase read fails
+- [x] Verify list renders correctly on mobile and desktop
 
 ---
 

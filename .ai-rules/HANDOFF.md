@@ -24,20 +24,23 @@ When starting a new session, the AI must read this file first to understand the 
 
 ## Current State
 
-**Last updated:** 2026-04-03
-**Active task:** TASK-003 - Routing Structure
+**Last updated:** 2026-06-02
+**Active task:** TASK-006 - Add Expense Modal
 
 **What was done last session:**
-- Completed TASK-002 by building a responsive app shell with a desktop sidebar and mobile drawer layout in `src/layout/AppShell.tsx`
-- Wired the new shell into `src/App.tsx` with placeholder content areas for future routed pages
-- Verified the new layout with a production build
+- Completed TASK-004: rewrote `src/pages/Login.tsx` with Google sign-in button, loading state, and error state using `signInWithPopup` + `GoogleAuthProvider`
+- Completed TASK-005: added sign-out button to `AppShell.tsx` footer, wired sidebar nav items to routes via `NavLink`, removed TASK-002 placeholder header text, fixed `App.tsx` to render `WebRoute` instead of `AppShell` directly (was causing NavLink Router context error)
+- Added `CLAUDE.md` at project root — Claude Code now auto-reads all `.ai-rules/` files on session start
+- Added `.claude/commands/` with `/create-prd`, `/generate-tasks`, `/process-task-list` slash commands
 
 **What to do next session:**
-- Start **TASK-003** (Routing Structure)
-- Confirm the planned route paths and placeholder page set before wiring `src/WebRoute.tsx`
-- Keep the current app shell and plug routing into it without reworking the layout structure
+- Start **TASK-006** (Add Expense Modal)
+- Build modal wrapper using shadcn/ui Dialog, expense form with fields: name, amount, currency, category, date, note
+- Wire Firebase write to `/expenses/users/{uid}/daily-expenses/{YYYY-MM-DD}/{expenseId}`
+- Trigger modal from the Add Expense button already in the app shell header
 
 **Loose ends / warnings:**
+- `AppShell.tsx` still renders TASK-002 placeholder content instead of `<Outlet />` — routed pages do not render yet. Fix this as part of TASK-006 or before, not as a standalone task
 - Build passes, but the main client bundle is above 500 kB and may need code-splitting later
 - Legacy code still exists under `src/legacy/` - treat it as reference only, not as a base
 - Port `43177` may already be occupied by another local process during dev checks
@@ -54,6 +57,8 @@ When starting a new session, the AI must read this file first to understand the 
 | 5 | 2026-04-03 | Full rewrite decided. Rewrote `TASKS.md` from scratch with 21 tasks across 8 phases in correct build order (foundation -> auth -> expenses -> views -> income -> dashboard -> polish -> AI) | Start TASK-001 next session |
 | 6 | 2026-04-03 | Completed TASK-001: archived old app into `src/legacy/`, created clean rewrite baseline, verified Tailwind/Firebase/Vite/Docker setup, and removed unused legacy dependencies | Start TASK-002 and agree navigation style before layout work |
 | 7 | 2026-04-03 | Completed TASK-002: built the new responsive app shell with a desktop sidebar, mobile drawer, header action area, and placeholder content panels | Start TASK-003 and wire routing into the new shell |
+| 8 | 2026-06-02 | Completed TASK-003: wired all routes in `src/WebRoute.tsx`, created placeholder pages for all 6 routes, added `ProtectedRoute` and `PublicRoute` guards | Start TASK-004 - Login Page |
+| 9 | 2026-06-02 | Completed TASK-004 and TASK-005: login page with Google sign-in, sign-out in sidebar, NavLink routing, fixed App.tsx to use WebRoute. Added CLAUDE.md and `/create-prd` `/generate-tasks` `/process-task-list` commands | Start TASK-006 - Add Expense Modal |
 
 ---
 

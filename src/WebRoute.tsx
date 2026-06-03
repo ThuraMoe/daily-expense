@@ -3,7 +3,7 @@ import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-rou
 import { useAuth } from "@/context/AuthContext";
 
 import Dashboard from "@/pages/Dashboard";
-import Expenses from "@/pages/Expenses";
+import Expenses from "@/pages/Expenses/index";
 import Income from "@/pages/Income";
 import Analytics from "@/pages/Analytics";
 import Settings from "@/pages/Settings";
