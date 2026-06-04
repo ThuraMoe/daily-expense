@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Cookie,
-  Film,
+  Clapperboard,
   HeartPulse,
   Home,
   Motorbike,
@@ -28,7 +28,7 @@ const CATEGORY_CONFIG: Record<string, CategoryMeta> = {
   "Snacks":        { color: "#facc15", Icon: Cookie },
   "Drink":         { color: "#3b82f6", Icon: Coffee },
   "Transport":     { color: "#22c55e", Icon: Motorbike },
-  "Entertainment": { color: "#ec4899", Icon: Film },
+  "Entertainment": { color: "#ec4899", Icon: Clapperboard },
   "Bill":          { color: "#ef4444", Icon: Receipt },
   "Personal Care": { color: "#14b8a6", Icon: Sparkles },
   "Healthcare":    { color: "#10b981", Icon: HeartPulse },

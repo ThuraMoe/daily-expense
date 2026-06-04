@@ -4,8 +4,7 @@ import type { User } from "firebase/auth";
 
 import { useAuth } from "@/context/AuthContext";
 import { app } from "@/firebaseConfig";
-import categoryList from "@/utils/CategoryList";
-import { getCategoryMeta } from "@/utils/CategoryConfig";
+import { getCategoryMeta, CATEGORY_CONFIG } from "@/utils/CategoryConfig";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,7 +71,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState(CURRENCIES[0]);
-  const [category, setCategory] = useState(categoryList[0]);
+  const [category, setCategory] = useState(Object.keys(CATEGORY_CONFIG)[0]);
   const [date, setDate] = useState(getTodayDate());
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
@@ -107,7 +106,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
     setName("");
     setAmount("");
     setCurrency(CURRENCIES[0]);
-    setCategory(categoryList[0]);
+    setCategory(Object.keys(CATEGORY_CONFIG)[0]);
     setDate(getTodayDate());
     setNote("");
     setNameError(null);
@@ -190,6 +189,8 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
           );
           await update(existingRef, payload);
         }
+        resetForm();
+        onClose();
       } else {
         const dayRef = ref(
           db,
@@ -197,9 +198,8 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
         );
         const newRef = push(dayRef);
         await set(newRef, payload);
+        resetForm();
       }
-
-      resetForm();
     } catch (err) {
       console.error("Failed to save expense:", err);
       setSubmitError("Failed to save. Please try again.");
@@ -229,7 +229,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
               id="expense-name"
               placeholder="e.g. Coffee"
               value={name}
-              onChange={(e) => { setName(e.target.value); setNameError(null); }}
+              onChange={(e) => { const v = e.target.value; setName(v.charAt(0).toUpperCase() + v.slice(1)); setNameError(null); }}
               disabled={loading}
               autoFocus
             />
@@ -276,7 +276,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
           <div>
             <label className={labelClass}>Category</label>
             <div className="flex flex-wrap gap-2">
-              {categoryList.map((cat) => {
+              {Object.keys(CATEGORY_CONFIG).map((cat) => {
                 const { color, Icon } = getCategoryMeta(cat);
                 const selected = category === cat;
                 return (
