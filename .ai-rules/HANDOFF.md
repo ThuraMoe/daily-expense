@@ -24,20 +24,19 @@ When starting a new session, the AI must read this file first to understand the 
 
 ## Current State
 
-**Last updated:** 2026-06-03
-**Active task:** TASK-011 - Expense Log View Tabs (Daily / Monthly / Yearly)
+**Last updated:** 2026-06-04
+**Active task:** TASK-014 - Monthly Income Entry
 
 **What was done last session:**
-- Completed TASK-010: CircleCheck/Circle toggle button (green active, grey inactive), Firebase update() flips active field, inactive cards at opacity-50, togglingId disables only the toggled card while write is in-flight; note field shown below category badge; backfill effect wrote missing active/note fields to existing records then was removed
+- Completed TASK-011: tab switcher (Daily / Monthly / Yearly), expenses grouped per view with totals, per-category breakdown, empty states
+- Completed TASK-012: date range filter with start/end date picker, filtered totals and per-category breakdown
+- Completed TASK-013: month range selector, Firebase data grouped by category, category totals view, defaults to current full year
 
 **What to do next session:**
-- Start **TASK-011** (Expense Log View Tabs — Daily / Monthly / Yearly)
-- Build tab switcher (Daily / Monthly / Yearly) using Tailwind
-- Daily view: expenses grouped by day with daily totals
-- Monthly view: expenses grouped by month with monthly totals
-- Yearly view: expenses grouped by year with yearly totals
-- Each view shows total for all expenses and total per category
-- Handle empty states per view
+- Start **TASK-014** (Monthly Income Entry)
+- Confirm data structure and Firebase path with human before writing any code
+- Build add/edit income UI (popup or inline — ask human)
+- Wire up Firebase read/write for income records
 
 **Loose ends / warnings:**
 - Build passes, but the main client bundle is above 500 kB and may need code-splitting later
@@ -61,6 +60,8 @@ When starting a new session, the AI must read this file first to understand the 
 | 10 | 2026-06-03 | Completed TASK-008: edit expense via AddExpenseModal — pencil button on each card, form pre-fill, Firebase update (in-place or date-change re-bucket), verified working | Start TASK-009 - Delete Expense |
 | 11 | 2026-06-03 | Completed TASK-009: Trash2 delete button on each card, shadcn/ui confirmation Dialog with expense name, Firebase remove() on date-bucketed path, loading lock on dialog | Start TASK-010 - Active/Inactive Toggle |
 | 12 | 2026-06-03 | Completed TASK-010: active/inactive toggle (green CircleCheck / grey Circle), Firebase update() on active field, opacity-50 for inactive cards, note field on cards, backfill effect for missing fields (removed after run) | Start TASK-011 - Expense Log View Tabs |
+| 13 | 2026-06-04 | Completed TASK-011: Daily/Monthly/Yearly tab switcher with grouped totals and per-category breakdown. Completed TASK-012: date range filter with start/end picker and filtered totals | Start TASK-013 - Category Monthly Totals View |
+| 14 | 2026-06-04 | Completed TASK-013: month range selector, Firebase data grouped by category, category totals view defaulting to current full year | Start TASK-014 - Monthly Income Entry |
 
 ---
 
