@@ -1,0 +1,28 @@
+services:
+  app:
+    # Build context points to the current directory where the Dockerfile is located
+    build: . 
+
+    container_name: daily-expense
+    
+    # Use the configured Vite port for both host and container.
+    ports:
+      - "43177:43177"
+      
+    # Mount the local project source code into the container
+    volumes:
+      # Mount the host project directory to the container's /app directory
+      - .:/app
+      # Explicitly declare a Docker volume for node_modules to prevent the 
+      # host's (potentially empty/wrong OS) modules from overwriting the container's
+      - /app/node_modules
+      
+    # *** CRITICAL FIX FOR HOT-RELOADING (HMR) ***
+    # This forces the file watcher (Chokidar, used by Vite) to poll the filesystem
+    # for changes, which is reliable across Docker volumes.
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      
+    command: npm run dev -- --host 
+    
+    restart: always
