@@ -76,7 +76,9 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
   const [date, setDate] = useState(getTodayDate());
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [amountError, setAmountError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Populate form fields when opening in edit mode.
   useEffect(() => {
@@ -87,7 +89,9 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
       setCategory(editExpense.category);
       setDate(editExpense.date);
       setNote(editExpense.note ?? "");
-      setError(null);
+      setNameError(null);
+      setAmountError(null);
+      setSubmitError(null);
     } else if (open && !editExpense) {
       resetForm();
     }
@@ -97,7 +101,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
   /**
    * resetForm
    *
-   * Resets all form fields to their initial values.
+   * Resets all form fields and validation errors to their initial values.
    */
   const resetForm = () => {
     setName("");
@@ -106,7 +110,9 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
     setCategory(categoryList[0]);
     setDate(getTodayDate());
     setNote("");
-    setError(null);
+    setNameError(null);
+    setAmountError(null);
+    setSubmitError(null);
   };
 
   /**
@@ -127,21 +133,28 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
    * record is deleted and a new one is written at the new date path.
    */
   const handleSubmit = async () => {
+    let valid = true;
     if (!name.trim()) {
-      setError("Expense name is required.");
-      return;
+      setNameError("Expense name is required.");
+      valid = false;
+    } else {
+      setNameError(null);
     }
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      setError("A valid amount greater than zero is required.");
-      return;
+      setAmountError("Enter a valid amount greater than zero.");
+      valid = false;
+    } else {
+      setAmountError(null);
     }
+    if (!valid) return;
+
     if (!currentUser) {
-      setError("You must be signed in to add an expense.");
+      setSubmitError("You must be signed in to add an expense.");
       return;
     }
 
     setLoading(true);
-    setError(null);
+    setSubmitError(null);
 
     try {
       const db = getDatabase(app);
@@ -187,10 +200,9 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
       }
 
       resetForm();
-      onClose();
     } catch (err) {
       console.error("Failed to save expense:", err);
-      setError("Failed to save. Please try again.");
+      setSubmitError("Failed to save. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -217,10 +229,13 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
               id="expense-name"
               placeholder="e.g. Coffee"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setNameError(null); }}
               disabled={loading}
               autoFocus
             />
+            {nameError && (
+              <p className="mt-1.5 text-xs text-destructive">{nameError}</p>
+            )}
           </div>
 
           {/* Amount + Currency */}
@@ -234,7 +249,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
                 min="0"
                 step="any"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => { setAmount(e.target.value); setAmountError(null); }}
                 disabled={loading}
                 className="min-w-0 flex-1"
               />
@@ -252,6 +267,9 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
                 ))}
               </select>
             </div>
+            {amountError && (
+              <p className="mt-1.5 text-xs text-destructive">{amountError}</p>
+            )}
           </div>
 
           {/* Category */}
@@ -315,10 +333,10 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
             />
           </div>
 
-          {/* Error */}
-          {error && (
+          {/* Firebase / auth error */}
+          {submitError && (
             <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {error}
+              {submitError}
             </p>
           )}
         </div>

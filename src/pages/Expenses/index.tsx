@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   get,
   getDatabase,
@@ -13,7 +13,7 @@ import {
   type DataSnapshot,
 } from "firebase/database";
 import type { User } from "firebase/auth";
-import { Circle, CircleCheck, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, Circle, CircleCheck, Pencil, Trash2 } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
 import { app } from "@/firebaseConfig";
@@ -23,6 +23,7 @@ import DateFilterPopover, {
   type DateFilter,
   formatFilterLabel,
 } from "@/components/DateFilter";
+import { MONTH_FULL } from "@/components/DateFilter/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -49,6 +50,13 @@ interface ExpenseGroup {
   key: string;
   label: string;
   items: Expense[];
+}
+
+interface YearlyMonthData {
+  month: string;
+  label: string;
+  total: number;
+  expenses: Expense[];
 }
 
 /**
@@ -323,11 +331,12 @@ const Expenses = () => {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<DateFilter>(buildDefaultFilter);
 
-  // Yearly infinite scroll state.
-  const [yearlyMonthCursor, setYearlyMonthCursor] = useState<string>("");
-  const [yearlyHasMore, setYearlyHasMore] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // Yearly accordion state.
+  const [yearlyMonths, setYearlyMonths] = useState<YearlyMonthData[]>([]);
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+  const [yearlyVersion, setYearlyVersion] = useState(0);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const view: ViewMode = filter.mode;
 
@@ -338,8 +347,9 @@ const Expenses = () => {
     setLoading(true);
     setExpenses([]);
     setError(null);
-    setYearlyHasMore(false);
-    setYearlyMonthCursor("");
+    setYearlyMonths([]);
+    setExpandedMonths(new Set());
+    setSelectedCategory(null);
 
     const db = getDatabase(app);
     const uid = currentUser.uid;
@@ -401,32 +411,49 @@ const Expenses = () => {
     if (filter.mode === "yearly" && filter.year) {
       const year = filter.year;
       const d = new Date();
-      // Start from the current month of the selected year, or December for past years.
-      const startMonth =
-        year === d.getFullYear() ? d.getMonth() + 1 : 12;
-      const mStr = String(startMonth).padStart(2, "0");
+      const maxMonth = year === d.getFullYear() ? d.getMonth() + 1 : 12;
 
-      const initialQuery = query(
-        ref(db, `expenses/users/${uid}/daily-expenses`),
-        orderByKey(),
-        startAt(`${year}-${mStr}-01`),
-        endAt(`${year}-${mStr}-99`)
-      );
-      get(initialQuery)
-        .then((snapshot) => {
-          setExpenses(
-            parseDateBucketedSnapshot(
+      const monthFetches: Promise<{ mNum: number; exps: Expense[] }>[] = Array.from(
+        { length: maxMonth },
+        (_, i) => {
+          const mNum = i + 1;
+          const mStr = String(mNum).padStart(2, "0");
+          const monthQuery = query(
+            ref(db, `expenses/users/${uid}/daily-expenses`),
+            orderByKey(),
+            startAt(`${year}-${mStr}-01`),
+            endAt(`${year}-${mStr}-99`)
+          );
+          return get(monthQuery).then((snapshot: DataSnapshot) => ({
+            mNum,
+            exps: parseDateBucketedSnapshot(
               snapshot.val() as Record<
                 string,
                 Record<string, Omit<Expense, "id" | "date">>
               > | null
-            )
-          );
+            ),
+          }));
+        }
+      );
+
+      Promise.all(monthFetches)
+        .then((results) => {
+          const months: YearlyMonthData[] = results
+            .map(({ mNum, exps }) => {
+              const mStr = String(mNum).padStart(2, "0");
+              const total = exps
+                .filter((e: Expense) => e.active !== false && e.currency === "$")
+                .reduce((sum: number, e: Expense) => sum + Number(e.amount), 0);
+              return {
+                month: `${year}-${mStr}`,
+                label: MONTH_FULL[mNum - 1],
+                total,
+                expenses: exps,
+              };
+            })
+            .reverse();
+          setYearlyMonths(months);
           setLoading(false);
-          if (startMonth > 1) {
-            setYearlyMonthCursor(`${year}-${String(startMonth - 1).padStart(2, "0")}`);
-            setYearlyHasMore(true);
-          }
         })
         .catch((err) => {
           console.error("Failed to read expenses:", err);
@@ -468,67 +495,15 @@ const Expenses = () => {
       );
       return () => unsub();
     }
-  }, [currentUser, filter]);
+  }, [currentUser, filter, yearlyVersion]);
 
-  /**
-   * loadMoreYearly
-   *
-   * Fetches the next older month's expenses and appends them. Advances the
-   * month cursor and clears yearlyHasMore when January is reached.
-   */
-  const loadMoreYearly = useCallback(async () => {
-    if (!currentUser || loadingMore || !yearlyHasMore || !yearlyMonthCursor) return;
-    setLoadingMore(true);
-    const db = getDatabase(app);
-    const [curYear, curMonth] = yearlyMonthCursor.split("-").map(Number);
-    const mStr = String(curMonth).padStart(2, "0");
-    try {
-      const monthQuery = query(
-        ref(db, `expenses/users/${currentUser.uid}/daily-expenses`),
-        orderByKey(),
-        startAt(`${curYear}-${mStr}-01`),
-        endAt(`${curYear}-${mStr}-99`)
-      );
-      const snapshot = await get(monthQuery);
-      const newExpenses = parseDateBucketedSnapshot(
-        snapshot.val() as Record<
-          string,
-          Record<string, Omit<Expense, "id" | "date">>
-        > | null
-      );
-      setExpenses((prev) => [...prev, ...newExpenses]);
-      if (curMonth <= 1) {
-        setYearlyHasMore(false);
-      } else {
-        setYearlyMonthCursor(`${curYear}-${String(curMonth - 1).padStart(2, "0")}`);
-      }
-    } catch (err) {
-      console.error("Failed to load more expenses:", err);
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [currentUser, yearlyMonthCursor, yearlyHasMore, loadingMore]);
-
-  // IntersectionObserver for yearly infinite scroll.
-  useEffect(() => {
-    if (view !== "yearly" || !yearlyHasMore || loadingMore) return;
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) loadMoreYearly();
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [view, yearlyHasMore, loadingMore, loadMoreYearly]);
 
   /**
    * handleToggleActive
    *
    * Flips the active flag on an expense record in Firebase. Uses togglingId
    * to disable the button on just that card while the write is in flight.
+   * In yearly view, also updates yearlyMonths local state to keep totals correct.
    *
    * @param {Expense} expense - The expense whose active state will be toggled.
    */
@@ -542,6 +517,23 @@ const Expenses = () => {
         `expenses/users/${currentUser.uid}/daily-expenses/${expense.date}/${expense.id}`
       );
       await update(expenseRef, { active: !expense.active });
+      if (view === "yearly") {
+        setYearlyMonths((prev) =>
+          prev.map((m) => {
+            if (!m.expenses.some((e) => e.id === expense.id)) return m;
+            const updated = m.expenses.map((e) =>
+              e.id === expense.id ? { ...e, active: !e.active } : e
+            );
+            return {
+              ...m,
+              expenses: updated,
+              total: updated
+                .filter((e) => e.active !== false && e.currency === "$")
+                .reduce((sum, e) => sum + Number(e.amount), 0),
+            };
+          })
+        );
+      }
     } catch (err) {
       console.error("Failed to toggle expense:", err);
     } finally {
@@ -553,7 +545,8 @@ const Expenses = () => {
    * handleDelete
    *
    * Removes the expense staged in deletingExpense from Firebase and clears
-   * the confirmation dialog.
+   * the confirmation dialog. In yearly view, also removes the record from
+   * yearlyMonths local state.
    */
   const handleDelete = async () => {
     if (!deletingExpense || !currentUser) return;
@@ -565,12 +558,44 @@ const Expenses = () => {
         `expenses/users/${currentUser.uid}/daily-expenses/${deletingExpense.date}/${deletingExpense.id}`
       );
       await remove(expenseRef);
+      if (view === "yearly") {
+        const deletedId = deletingExpense.id;
+        setYearlyMonths((prev) =>
+          prev.map((m) => {
+            if (!m.expenses.some((e) => e.id === deletedId)) return m;
+            const updated = m.expenses.filter((e) => e.id !== deletedId);
+            return {
+              ...m,
+              expenses: updated,
+              total: updated
+                .filter((e) => e.active !== false && e.currency === "$")
+                .reduce((sum, e) => sum + Number(e.amount), 0),
+            };
+          })
+        );
+      }
       setDeletingExpense(null);
     } catch (err) {
       console.error("Failed to delete expense:", err);
     } finally {
       setDeleteLoading(false);
     }
+  };
+
+  /**
+   * toggleExpandedMonth
+   *
+   * Toggles the open/closed state of a month accordion box in the yearly view.
+   *
+   * @param {string} month - The month key (YYYY-MM) to toggle.
+   */
+  const toggleExpandedMonth = (month: string) => {
+    setExpandedMonths((prev) => {
+      const next = new Set(prev);
+      if (next.has(month)) next.delete(month);
+      else next.add(month);
+      return next;
+    });
   };
 
   if (loading) {
@@ -591,8 +616,12 @@ const Expenses = () => {
     );
   }
 
-  const stats = calcStats(expenses, view);
-  const grouped = view !== "daily" ? groupByDate(expenses) : [];
+  const allYearlyExpenses = view === "yearly" ? yearlyMonths.flatMap((m) => m.expenses) : [];
+  const stats = calcStats(view === "yearly" ? allYearlyExpenses : expenses, view);
+  const displayExpenses = selectedCategory
+    ? expenses.filter((e) => e.category === selectedCategory)
+    : expenses;
+  const grouped = view === "monthly" || view === "range" ? groupByDate(displayExpenses) : [];
   const periodLabel = formatFilterLabel(filter);
 
   // For daily view: determine which date label to show.
@@ -645,34 +674,55 @@ const Expenses = () => {
           </div>
         </div>
 
-        {/* Category breakdown */}
+        {/* Category breakdown — chips are clickable filters */}
         {Object.keys(stats.byCategory).length > 0 && (
-          <div className="mb-6 rounded-xl bg-muted px-4 py-3">
+          <div className="mb-4 rounded-xl bg-muted px-4 py-3">
             <p className="mb-2.5 text-xs font-medium text-muted-foreground">Categories</p>
             <div className="flex flex-wrap gap-2">
               {Object.entries(stats.byCategory)
                 .sort(([, a], [, b]) => b - a)
                 .map(([cat, amount]) => {
                   const { color, Icon } = getCategoryMeta(cat);
+                  const isActive = selectedCategory === cat;
                   return (
-                    <span
+                    <button
                       key={cat}
-                      className="flex items-center gap-1.5 rounded-full bg-background px-2.5 py-1 text-xs"
+                      onClick={() => setSelectedCategory(isActive ? null : cat)}
+                      className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs transition-all"
+                      style={
+                        isActive
+                          ? { backgroundColor: `${color}30`, color, outline: `2px solid ${color}`, outlineOffset: "1px" }
+                          : { backgroundColor: "var(--background)", color: "var(--muted-foreground)" }
+                      }
                     >
-                      <Icon size={12} style={{ color }} />
-                      <span className="text-muted-foreground">{cat}</span>
-                      <span className="font-semibold text-foreground">
+                      <Icon size={12} style={{ color: isActive ? color : undefined }} />
+                      <span>{cat}</span>
+                      <span className="font-semibold" style={{ color: isActive ? color : "var(--foreground)" }}>
                         ${amount.toLocaleString()}
                       </span>
-                    </span>
+                    </button>
                   );
                 })}
             </div>
           </div>
         )}
 
+        {/* Active category filter indicator */}
+        {selectedCategory && (
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Filtered by</span>
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+            >
+              {selectedCategory}
+              <span className="ml-0.5 text-primary/70">×</span>
+            </button>
+          </div>
+        )}
+
         {/* Empty state */}
-        {expenses.length === 0 && !loadingMore && (view !== "yearly" || !yearlyHasMore) && (
+        {expenses.length === 0 && view !== "yearly" && (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
             <p className="text-base font-medium">{EMPTY_MESSAGES[view]}</p>
             {view === "daily" && (
@@ -686,17 +736,17 @@ const Expenses = () => {
           <div className="flex flex-col gap-6">
             <section>
               <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-sm font-medium text-muted-foreground">
+                <h2 className="text-sm font-semibold text-foreground">
                   {periodLabel === "Today"
                     ? `Today — ${formatDate(dailyDisplayDate)}`
                     : formatDate(dailyDisplayDate)}
                 </h2>
-                <span className="text-xs font-medium text-muted-foreground">
+                <span className="text-sm font-bold text-foreground">
                   {stats.totalSpent > 0 ? `$${stats.totalSpent.toLocaleString()}` : "–"}
                 </span>
               </div>
               <div className="flex flex-col gap-2">
-                {expenses.map((expense) => (
+                {displayExpenses.map((expense) => (
                   <ExpenseCard
                     key={expense.id}
                     expense={expense}
@@ -711,8 +761,8 @@ const Expenses = () => {
           </div>
         )}
 
-        {/* Monthly / Yearly / Range: expenses grouped by day */}
-        {view !== "daily" && expenses.length > 0 && (
+        {/* Monthly / Range: expenses grouped by day */}
+        {(view === "monthly" || view === "range") && expenses.length > 0 && (
           <div className="flex flex-col gap-6">
             {grouped.map(({ key, label, items }) => {
               const groupTotal = items
@@ -721,8 +771,8 @@ const Expenses = () => {
               return (
                 <section key={key}>
                   <div className="mb-2 flex items-center justify-between">
-                    <h2 className="text-sm font-medium text-muted-foreground">{label}</h2>
-                    <span className="text-xs font-medium text-muted-foreground">
+                    <h2 className="text-sm font-semibold text-foreground">{label}</h2>
+                    <span className="text-sm font-bold text-foreground">
                       {groupTotal > 0 ? `$${groupTotal.toLocaleString()}` : "–"}
                     </span>
                   </div>
@@ -744,22 +794,91 @@ const Expenses = () => {
           </div>
         )}
 
-        {/* Yearly scroll sentinel */}
+        {/* Yearly: accordion month boxes */}
         {view === "yearly" && (
-          <div ref={sentinelRef} className="pb-4 pt-2 text-center">
-            {loadingMore && (
-              <p className="text-sm text-muted-foreground">Loading more…</p>
-            )}
-            {!yearlyHasMore && !loadingMore && expenses.length > 0 && (
-              <p className="text-xs text-muted-foreground">All records loaded</p>
-            )}
+          <div className="flex flex-col gap-2">
+            {yearlyMonths.map(({ month, label, total, expenses: monthExpenses }) => {
+              const displayMonthExpenses = selectedCategory
+                ? monthExpenses.filter((e) => e.category === selectedCategory)
+                : monthExpenses;
+              const isExpanded = expandedMonths.has(month);
+              const dayGroups = groupByDate(displayMonthExpenses);
+              return (
+                <div key={month} className="overflow-hidden rounded-xl border bg-card">
+                  <button
+                    className={`flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-muted/50 ${isExpanded ? "bg-muted" : ""}`}
+                    onClick={() => toggleExpandedMonth(month)}
+                  >
+                    <span className="text-sm font-bold text-foreground">{label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-foreground">
+                        {total > 0 ? `$${total.toLocaleString()}` : "–"}
+                      </span>
+                      <ChevronDown
+                        size={15}
+                        className={`shrink-0 text-muted-foreground transition-transform ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t px-4 py-3">
+                      {displayMonthExpenses.length === 0 ? (
+                        <p className="py-2 text-sm text-muted-foreground">
+                          {selectedCategory
+                            ? `No ${selectedCategory} expenses this month.`
+                            : "No expenses this month."}
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-4">
+                          {dayGroups.map(({ key, label: dayLabel, items }) => {
+                            const dayTotal = items
+                              .filter((i) => i.active !== false && i.currency === "$")
+                              .reduce((sum, i) => sum + Number(i.amount), 0);
+                            return (
+                              <section key={key}>
+                                <div className="mb-2 flex items-center justify-between">
+                                  <h2 className="text-sm font-semibold text-foreground">
+                                    {dayLabel}
+                                  </h2>
+                                  <span className="text-sm font-bold text-foreground">
+                                    {dayTotal > 0 ? `$${dayTotal.toLocaleString()}` : "–"}
+                                  </span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  {items.map((expense) => (
+                                    <ExpenseCard
+                                      key={expense.id}
+                                      expense={expense}
+                                      togglingId={togglingId}
+                                      onToggle={handleToggleActive}
+                                      onEdit={setEditingExpense}
+                                      onDelete={setDeletingExpense}
+                                    />
+                                  ))}
+                                </div>
+                              </section>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
       <AddExpenseModal
         open={editingExpense !== null}
-        onClose={() => setEditingExpense(null)}
+        onClose={() => {
+          setEditingExpense(null);
+          if (view === "yearly") setYearlyVersion((v) => v + 1);
+        }}
         editExpense={editingExpense ?? undefined}
       />
 
