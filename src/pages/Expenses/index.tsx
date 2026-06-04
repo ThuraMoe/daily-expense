@@ -255,7 +255,7 @@ const ExpenseCard = ({ expense, togglingId, onToggle, onEdit, onDelete }: Expens
       {/* Amount + action buttons */}
       <div className="flex shrink-0 items-center gap-1">
         <span className="mr-1 text-sm font-semibold text-card-foreground">
-          {expense.currency}{Number(expense.amount).toLocaleString()}
+          {expense.currency}{Number(expense.amount).toFixed(2)}
         </span>
         <button
           aria-label={expense.active === false ? "Mark active" : "Mark inactive"}
