@@ -202,25 +202,25 @@ The AI must not reuse old code unless the human explicitly says so.
 ---
 
 ### TASK-012 - Date Range Filter
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Allow user to pick a custom date range and see expense logs with totals for all and per category.
 **Steps:**
-- [ ] Add date range picker (start date / end date) - use Day.js for all date logic
-- [ ] Filter Firebase expense data by selected range
-- [ ] Show total for all expenses in range
-- [ ] Show breakdown total per category in range
-- [ ] Agree default date range with human before implementing
+- [x] Add date range picker (start date / end date) - use Day.js for all date logic
+- [x] Filter Firebase expense data by selected range
+- [x] Show total for all expenses in range
+- [x] Show breakdown total per category in range
+- [x] Agree default date range with human before implementing
 
 ---
 
 ### TASK-013 - Category Monthly Totals View
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** A view showing total per category for a selected month range. Default shows the whole current year.
 **Steps:**
-- [ ] Build month range selector
-- [ ] Query and group Firebase data by category for selected range
-- [ ] Display category totals (table or chart - ask human to decide)
-- [ ] Default to current full year on first load
+- [x] Build month range selector
+- [x] Query and group Firebase data by category for selected range
+- [x] Display category totals (table or chart - ask human to decide)
+- [x] Default to current full year on first load
 
 ---
 

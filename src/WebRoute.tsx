@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 
 import Dashboard from "@/pages/Dashboard";
 import Expenses from "@/pages/Expenses/index";
-import Income from "@/pages/Income";
+import Income from "@/pages/Income/index";
 import Analytics from "@/pages/Analytics";
 import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";

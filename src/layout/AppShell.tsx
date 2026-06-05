@@ -8,6 +8,7 @@ import {
   PlusCircle,
   Settings,
   Sparkles,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 import { signOut } from "firebase/auth";
@@ -19,6 +20,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import AddExpenseModal from "@/components/AddExpenseModal";
+import AddIncomeModal from "@/components/AddIncomeModal";
 import {
   Sidebar,
   SidebarContent,
@@ -47,6 +49,7 @@ const navigationItems = [
 
 const quickActions = [
   { label: "Add Expense", icon: PlusCircle },
+  { label: "Add Income", icon: TrendingUp },
   { label: "Review Trends", icon: Sparkles },
 ];
 
@@ -61,6 +64,7 @@ const quickActions = [
 const AppShell = () => {
   const { currentUser } = useAuth();
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const [incomeModalOpen, setIncomeModalOpen] = useState(false);
   const userLabel =
     currentUser?.displayName || currentUser?.email || "Guest User";
   const userEmail = currentUser?.email || "";
@@ -138,7 +142,13 @@ const AppShell = () => {
                   <button
                     key={action.label}
                     type="button"
-                    onClick={action.label === "Add Expense" ? () => setExpenseModalOpen(true) : undefined}
+                    onClick={
+                      action.label === "Add Expense"
+                        ? () => setExpenseModalOpen(true)
+                        : action.label === "Add Income"
+                        ? () => setIncomeModalOpen(true)
+                        : undefined
+                    }
                     className="flex w-full items-center justify-between rounded-2xl border border-sidebar-border/80 bg-background/80 px-3 py-3 text-left transition-colors hover:border-sidebar-primary/30 hover:bg-sidebar-accent"
                   >
                     <span className="flex items-center gap-3">
@@ -188,7 +198,16 @@ const AppShell = () => {
         {/* Header lives INSIDE SidebarInset in sidebar-07 */}
         <header className="flex h-16 shrink-0 items-center gap-2 px-4 md:px-12">
           <SidebarTrigger className="-ml-1" />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-xl px-3 shadow-sm sm:px-4"
+              onClick={() => setIncomeModalOpen(true)}
+            >
+              <TrendingUp className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Add Income</span>
+            </Button>
             <Button
               size="sm"
               className="rounded-xl px-3 shadow-sm sm:px-4"
@@ -208,6 +227,10 @@ const AppShell = () => {
       <AddExpenseModal
         open={expenseModalOpen}
         onClose={() => setExpenseModalOpen(false)}
+      />
+      <AddIncomeModal
+        open={incomeModalOpen}
+        onClose={() => setIncomeModalOpen(false)}
       />
     </SidebarProvider>
   );
