@@ -34,7 +34,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
@@ -190,7 +189,6 @@ const AppShell = () => {
           </div>
         </SidebarFooter>
 
-        <SidebarRail />
       </Sidebar>
 
       {/* ── Main area — sidebar-07 inset pattern ── */}
