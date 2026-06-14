@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { getDatabase, push, ref, remove, set, update } from "firebase/database";
 import type { User } from "firebase/auth";
 
@@ -17,6 +18,40 @@ import {
 } from "@/components/ui/dialog";
 
 const CURRENCIES = ["$", "៛", "Ks"];
+
+/** Maps Ctrl+letter → category name. */
+const CATEGORY_KEYS: Record<string, string> = {
+  g: "Groceries",
+  d: "Dining Out",
+  s: "Snacks",
+  k: "Drink",
+  q: "Transport",
+  e: "Entertainment",
+  b: "Bill",
+  l: "Personal Care",
+  h: "Healthcare",
+  m: "Family",
+  j: "Friends",
+  i: "Trip",
+  o: "Others",
+};
+
+/** Maps category name → uppercase key letter shown on the chip. */
+const CATEGORY_KEY_LABEL: Record<string, string> = {
+  "Groceries":     "G",
+  "Dining Out":    "D",
+  "Snacks":        "S",
+  "Drink":         "K",
+  "Transport":     "Q",
+  "Entertainment": "E",
+  "Bill":          "B",
+  "Personal Care": "L",
+  "Healthcare":    "H",
+  "Family":        "M",
+  "Friends":       "J",
+  "Trip":          "I",
+  "Others":        "O",
+};
 
 interface Expense {
   id: string;
@@ -68,6 +103,11 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
 
   const isEditing = !!editExpense;
 
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  // Set to true after a successful add save so the effect below can focus
+  // the name field once React re-enables it (loading → false).
+  const shouldFocusName = useRef(false);
+
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState(CURRENCIES[0]);
@@ -78,6 +118,14 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
   const [nameError, setNameError] = useState<string | null>(null);
   const [amountError, setAmountError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // After a successful add save, focus the name field once loading clears.
+  useEffect(() => {
+    if (!loading && shouldFocusName.current) {
+      shouldFocusName.current = false;
+      nameInputRef.current?.focus();
+    }
+  }, [loading]);
 
   // Populate form fields when opening in edit mode.
   useEffect(() => {
@@ -101,13 +149,17 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
    * resetForm
    *
    * Resets all form fields and validation errors to their initial values.
+   * Pass keepDate=true after a successful add so the user's selected date
+   * is preserved for the next entry.
+   *
+   * @param {boolean} [keepDate] - When true, the date field is not reset.
    */
-  const resetForm = () => {
+  const resetForm = (keepDate?: boolean) => {
     setName("");
     setAmount("");
     setCurrency(CURRENCIES[0]);
     setCategory(Object.keys(CATEGORY_CONFIG)[0]);
-    setDate(getTodayDate());
+    if (!keepDate) setDate(getTodayDate());
     setNote("");
     setNameError(null);
     setAmountError(null);
@@ -198,7 +250,8 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
         );
         const newRef = push(dayRef);
         await set(newRef, payload);
-        resetForm();
+        resetForm(true);
+        shouldFocusName.current = true;
       }
     } catch (err) {
       console.error("Failed to save expense:", err);
@@ -208,13 +261,44 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
     }
   };
 
+  /**
+   * handleKeyDown
+   *
+   * Submits the form when Enter is pressed, unless focus is on a textarea,
+   * button, or select element where Enter has its own native meaning.
+   *
+   * @param {KeyboardEvent} e - The keyboard event from DialogContent.
+   */
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // Ctrl+letter → select category
+    if (e.ctrlKey && !e.shiftKey && !e.altKey) {
+      const cat = CATEGORY_KEYS[e.key.toLowerCase()];
+      if (cat) {
+        e.preventDefault();
+        setCategory(cat);
+        return;
+      }
+    }
+
+    // Enter → submit (not on textarea / button / select)
+    if (
+      e.key === "Enter" &&
+      !(e.target instanceof HTMLTextAreaElement) &&
+      !(e.target instanceof HTMLButtonElement) &&
+      !(e.target instanceof HTMLSelectElement)
+    ) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   const labelClass = "block text-sm font-medium text-foreground mb-1.5";
   const selectClass =
     "w-full rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md" onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit Expense" : "Add Expense"}</DialogTitle>
         </DialogHeader>
@@ -227,6 +311,7 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
             </label>
             <Input
               id="expense-name"
+              ref={nameInputRef}
               placeholder="e.g. Coffee"
               value={name}
               onChange={(e) => { const v = e.target.value; setName(v.charAt(0).toUpperCase() + v.slice(1)); setNameError(null); }}
@@ -294,6 +379,9 @@ const AddExpenseModal = ({ open, onClose, editExpense }: AddExpenseModalProps) =
                   >
                     <Icon size={12} style={{ color }} />
                     {cat}
+                    <span className="ml-0.5 rounded bg-black/10 px-1 py-0.5 font-mono text-[9px] font-normal leading-none dark:bg-white/10">
+                      {CATEGORY_KEY_LABEL[cat]}
+                    </span>
                   </button>
                 );
               })}
