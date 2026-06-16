@@ -261,27 +261,27 @@ const ExpenseCard = ({ expense, togglingId, onToggle, onEdit, onDelete }: Expens
           aria-label={expense.active === false ? "Mark active" : "Mark inactive"}
           onClick={() => onToggle(expense)}
           disabled={togglingId === expense.id}
-          className={`rounded-lg p-1 transition-colors disabled:opacity-50 ${
+          className={`rounded-lg p-2.5 transition-colors disabled:opacity-50 ${
             expense.active === false
               ? "text-muted-foreground hover:bg-muted hover:text-foreground"
               : "text-green-500 hover:bg-green-500/10"
           }`}
         >
-          {expense.active === false ? <Circle size={14} /> : <CircleCheck size={14} />}
+          {expense.active === false ? <Circle size={18} /> : <CircleCheck size={18} />}
         </button>
         <button
           aria-label="Edit expense"
           onClick={() => onEdit(expense)}
-          className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="rounded-lg p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
-          <Pencil size={14} />
+          <Pencil size={18} />
         </button>
         <button
           aria-label="Delete expense"
           onClick={() => onDelete(expense)}
-          className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+          className="rounded-lg p-2.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
         >
-          <Trash2 size={14} />
+          <Trash2 size={18} />
         </button>
       </div>
     </div>
