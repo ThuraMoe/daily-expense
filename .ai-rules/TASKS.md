@@ -227,15 +227,15 @@ The AI must not reuse old code unless the human explicitly says so.
 ## Phase 5 - Income
 
 ### TASK-014 - Monthly Income Entry
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Allow user to log their monthly income. Stored separately from expenses.
-**Firebase path:** `/expenses/users/{uid}/income/{YYYY-MM}`
+**Firebase path:** `/expenses/users/{uid}/income/{YYYY-MM}/{incomeId}`
 **Steps:**
-- [ ] Confirm data structure and path with human before writing any code
-- [ ] Build add/edit income UI (popup or inline - ask human)
-- [ ] Wire up Firebase read/write for income records
-- [ ] Show income entry on relevant views
-- [ ] Handle empty state (no income logged yet)
+- [x] Confirm data structure and path with human before writing any code
+- [x] Build add/edit income UI (popup or inline - ask human)
+- [x] Wire up Firebase read/write for income records
+- [x] Show income entry on relevant views
+- [x] Handle empty state (no income logged yet)
 
 ---
 
