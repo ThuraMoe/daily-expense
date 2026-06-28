@@ -24,13 +24,12 @@ When starting a new session, the AI must read this file first to understand the 
 
 ## Current State
 
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-28
 **Active task:** TASK-014 - Monthly Income Entry
 
 **What was done last session:**
-- Completed TASK-011: tab switcher (Daily / Monthly / Yearly), expenses grouped per view with totals, per-category breakdown, empty states
-- Completed TASK-012: date range filter with start/end date picker, filtered totals and per-category breakdown
-- Completed TASK-013: month range selector, Firebase data grouped by category, category totals view, defaults to current full year
+- Completed TASK-019: dark mode toggle — `ThemeProvider` context in `src/context/ThemeContext.tsx`, wrapped in `main.tsx`, Sun/Moon button in AppShell header, preference saved to localStorage, falls back to OS preference
+- Eye-comfort color adjustments: light mode backgrounds softened in `index.css`, Total Spent stat card changed from `bg-primary/10` to `bg-muted`
 
 **What to do next session:**
 - Start **TASK-014** (Monthly Income Entry)
@@ -62,6 +61,7 @@ When starting a new session, the AI must read this file first to understand the 
 | 12 | 2026-06-03 | Completed TASK-010: active/inactive toggle (green CircleCheck / grey Circle), Firebase update() on active field, opacity-50 for inactive cards, note field on cards, backfill effect for missing fields (removed after run) | Start TASK-011 - Expense Log View Tabs |
 | 13 | 2026-06-04 | Completed TASK-011: Daily/Monthly/Yearly tab switcher with grouped totals and per-category breakdown. Completed TASK-012: date range filter with start/end picker and filtered totals | Start TASK-013 - Category Monthly Totals View |
 | 14 | 2026-06-04 | Completed TASK-013: month range selector, Firebase data grouped by category, category totals view defaulting to current full year | Start TASK-014 - Monthly Income Entry |
+| 15 | 2026-06-28 | Completed TASK-019: dark mode toggle with ThemeContext, localStorage persistence, Sun/Moon button in header. Eye-comfort color pass on light mode surfaces and Total Spent card | Start TASK-014 - Monthly Income Entry |
 
 ---
 
