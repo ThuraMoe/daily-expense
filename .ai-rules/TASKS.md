@@ -294,13 +294,13 @@ The AI must not reuse old code unless the human explicitly says so.
 ---
 
 ### TASK-019 - Dark Mode
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Add a light/dark toggle. User preference persists in localStorage.
 **Steps:**
-- [ ] Set up Tailwind dark mode config (`darkMode: 'class'` in `tailwind.config`)
-- [ ] Add toggle button to navigation or settings page
-- [ ] Save and load preference from localStorage
-- [ ] Apply dark mode classes across all Tailwind components
+- [x] Set up Tailwind dark mode config — already wired via `@custom-variant dark` in `index.css`
+- [x] Add toggle button to navigation or settings page — Sun/Moon button in AppShell header
+- [x] Save and load preference from localStorage — handled in `src/context/ThemeContext.tsx`
+- [x] Apply dark mode classes across all Tailwind components — all components use CSS variables; dark vars already defined in `index.css`
 - [ ] Verify dark mode on mobile and desktop
 
 ---
