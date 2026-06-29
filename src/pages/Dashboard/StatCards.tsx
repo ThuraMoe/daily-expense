@@ -4,22 +4,33 @@ interface StatCardsProps {
   totalIncome: number;
   totalExpenses: number;
   periodLabel: string;
+  /** Previous period's total expenses — used to show month-over-month delta. Undefined when not applicable. */
+  prevExpenses?: number;
 }
 
 /**
  * StatCards
  *
  * Renders three summary stat cards: Total Income, Total Spent, and Money Left.
+ * When prevExpenses is provided, a delta indicator is shown under the Spent card.
  * Money Left is coloured green when positive and red when negative.
  *
  * @param {StatCardsProps} props
  */
-const StatCards = ({ totalIncome, totalExpenses, periodLabel }: StatCardsProps) => {
+const StatCards = ({
+  totalIncome,
+  totalExpenses,
+  periodLabel,
+  prevExpenses,
+}: StatCardsProps) => {
   const moneyLeft = totalIncome - totalExpenses;
   const leftPositive = moneyLeft >= 0;
 
   const fmt = (n: number) =>
     n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Month-over-month delta — only shown when prevExpenses is provided.
+  const delta = prevExpenses !== undefined ? totalExpenses - prevExpenses : null;
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -48,7 +59,21 @@ const StatCards = ({ totalIncome, totalExpenses, periodLabel }: StatCardsProps) 
         <p className="mt-2 text-2xl font-bold text-primary">
           {totalExpenses > 0 ? `$${fmt(totalExpenses)}` : "–"}
         </p>
-        <p className="mt-0.5 text-[10px] text-primary/60">{periodLabel}</p>
+        {delta !== null ? (
+          <p
+            className={`mt-0.5 text-[10px] font-medium ${
+              delta > 0
+                ? "text-destructive/80"
+                : delta < 0
+                ? "text-emerald-600/80"
+                : "text-muted-foreground"
+            }`}
+          >
+            {delta > 0 ? `$${fmt(delta)} more than last month` : delta < 0 ? `$${fmt(Math.abs(delta))} less than last month` : "Same as last month"}
+          </p>
+        ) : (
+          <p className="mt-0.5 text-[10px] text-primary/60">{periodLabel}</p>
+        )}
       </div>
 
       {/* Money Left */}
