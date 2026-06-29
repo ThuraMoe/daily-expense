@@ -1,4 +1,5 @@
 import { getCategoryMeta } from "@/utils/CategoryConfig";
+import MaskedAmount from "@/components/MaskedAmount";
 
 interface BiggestExpense {
   name: string;
@@ -84,10 +85,12 @@ const Highlights = ({ savingsRate, biggest }: HighlightsProps) => {
               <p className="truncate text-sm font-bold text-foreground">{biggest.name}</p>
             </div>
             <p className="mt-0.5 text-[10px] text-muted-foreground">
-              ${biggest.amount.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
+              <MaskedAmount>
+                ${biggest.amount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </MaskedAmount>{" "}
               · {formatShortDate(biggest.date)}
             </p>
           </div>

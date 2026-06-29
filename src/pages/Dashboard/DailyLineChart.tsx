@@ -1,5 +1,6 @@
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@/context/ThemeContext";
+import { useMask } from "@/context/MaskContext";
 
 interface DailyLineChartProps {
   /** All expenses for the selected month (active and inactive). */
@@ -19,6 +20,7 @@ interface DailyLineChartProps {
  */
 const DailyLineChart = ({ expenses, month }: DailyLineChartProps) => {
   const { theme } = useTheme();
+  const { masked } = useMask();
   const isDark = theme === "dark";
 
   const [year, m] = month.split("-").map(Number);
@@ -98,7 +100,9 @@ const DailyLineChart = ({ expenses, month }: DailyLineChartProps) => {
             tickPadding: 8,
             tickValues: 4,
             format: (v) =>
-              Number(v) >= 1000
+              masked
+                ? "•••"
+                : Number(v) >= 1000
                 ? `$${(Number(v) / 1000).toFixed(1)}k`
                 : `$${v}`,
           }}
@@ -118,11 +122,12 @@ const DailyLineChart = ({ expenses, month }: DailyLineChartProps) => {
                 Day {String(point.data.x)}
               </p>
               <p className="font-semibold">
-                $
-                {Number(point.data.y).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                {masked
+                  ? "•••"
+                  : `$${Number(point.data.y).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`}
               </p>
             </div>
           )}

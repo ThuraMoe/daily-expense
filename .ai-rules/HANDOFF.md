@@ -24,18 +24,15 @@ When starting a new session, the AI must read this file first to understand the 
 
 ## Current State
 
-**Last updated:** 2026-06-28
-**Active task:** TASK-014 - Monthly Income Entry
+**Last updated:** 2026-06-29
+**Active task:** —
 
 **What was done last session:**
-- Completed TASK-019: dark mode toggle — `ThemeProvider` context in `src/context/ThemeContext.tsx`, wrapped in `main.tsx`, Sun/Moon button in AppShell header, preference saved to localStorage, falls back to OS preference
-- Eye-comfort color adjustments: light mode backgrounds softened in `index.css`, Total Spent stat card changed from `bg-primary/10` to `bg-muted`
+- Completed TASK-015: Monthly Income vs Expense View — income and expense data per month from Firebase, totals and per-category breakdown
+- Completed TASK-017: Dashboard Page — stat cards, daily line chart, highlights, income breakdown, recent expenses components
 
 **What to do next session:**
-- Start **TASK-014** (Monthly Income Entry)
-- Confirm data structure and Firebase path with human before writing any code
-- Build add/edit income UI (popup or inline — ask human)
-- Wire up Firebase read/write for income records
+- Decide which task to start next (TASK-016, TASK-018, TASK-020, or TASK-021)
 
 **Loose ends / warnings:**
 - Build passes, but the main client bundle is above 500 kB and may need code-splitting later
@@ -62,6 +59,7 @@ When starting a new session, the AI must read this file first to understand the 
 | 13 | 2026-06-04 | Completed TASK-011: Daily/Monthly/Yearly tab switcher with grouped totals and per-category breakdown. Completed TASK-012: date range filter with start/end picker and filtered totals | Start TASK-013 - Category Monthly Totals View |
 | 14 | 2026-06-04 | Completed TASK-013: month range selector, Firebase data grouped by category, category totals view defaulting to current full year | Start TASK-014 - Monthly Income Entry |
 | 15 | 2026-06-28 | Completed TASK-019: dark mode toggle with ThemeContext, localStorage persistence, Sun/Moon button in header. Eye-comfort color pass on light mode surfaces and Total Spent card | Start TASK-014 - Monthly Income Entry |
+| 16 | 2026-06-29 | Completed TASK-015: Monthly Income vs Expense View. Completed TASK-017: Dashboard Page (StatCards, DailyLineChart, Highlights, IncomeBreakdown, RecentExpenses) | Pick next task |
 
 ---
 
