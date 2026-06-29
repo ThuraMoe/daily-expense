@@ -18,6 +18,10 @@ import DateFilterPopover, {
 } from "@/components/DateFilter";
 import StatCards from "./StatCards";
 import CategoryBreakdown from "./CategoryBreakdown";
+import Highlights from "./Highlights";
+import DailyLineChart from "./DailyLineChart";
+import RecentExpenses from "./RecentExpenses";
+import IncomeBreakdown, { type IncomeRecord } from "./IncomeBreakdown";
 
 interface Expense {
   id: string;
@@ -86,6 +90,20 @@ function getMonthsForFilter(filter: DateFilter): string[] {
 }
 
 /**
+ * shiftMonthBack
+ *
+ * Returns the YYYY-MM string one calendar month before the given one.
+ *
+ * @param {string} month - YYYY-MM string.
+ * @returns {string}
+ */
+function shiftMonthBack(month: string): string {
+  const [y, m] = month.split("-").map(Number);
+  if (m === 1) return `${y - 1}-12`;
+  return `${y}-${String(m - 1).padStart(2, "0")}`;
+}
+
+/**
  * parseDateBucketedSnapshot
  *
  * Flattens a date-bucketed Firebase snapshot into a plain expense array.
@@ -128,12 +146,42 @@ function parseDaySnapshot(
 }
 
 /**
+ * fetchMonthExpensesTotal
+ *
+ * Fetches the total active $ expense amount for a given YYYY-MM month.
+ *
+ * @param {ReturnType<typeof getDatabase>} db - Firebase database instance.
+ * @param {string} uid - Authenticated user ID.
+ * @param {string} month - YYYY-MM string.
+ * @returns {Promise<number>}
+ */
+async function fetchMonthExpensesTotal(
+  db: ReturnType<typeof getDatabase>,
+  uid: string,
+  month: string
+): Promise<number> {
+  const q = query(
+    ref(db, `expenses/users/${uid}/daily-expenses`),
+    orderByKey(),
+    startAt(`${month}-01`),
+    endAt(`${month}-99`)
+  );
+  const snap = await get(q);
+  const expenses = parseDateBucketedSnapshot(
+    snap.val() as Record<string, Record<string, Omit<Expense, "id" | "date">>> | null
+  );
+  return expenses
+    .filter((e) => e.active !== false && e.currency === "$")
+    .reduce((sum, e) => sum + Number(e.amount), 0);
+}
+
+/**
  * Dashboard
  *
  * Main dashboard page showing income vs expense summary for a selected period.
  * Uses DateFilterPopover to switch between day / month / year / range views.
- * Fetches income from /expenses/users/{uid}/income/{YYYY-MM} and expenses from
- * /expenses/users/{uid}/daily-expenses. Only active ($-currency) expenses count.
+ * Fetches income (with per-source records) and expenses, then derives stats
+ * including category breakdown, savings rate, biggest expense, and daily chart.
  *
  * @returns {JSX.Element} The dashboard page.
  */
@@ -142,7 +190,10 @@ const Dashboard = () => {
 
   const [filter, setFilter] = useState<DateFilter>(buildDefaultFilter);
   const [totalIncome, setTotalIncome] = useState(0);
+  const [incomeRecords, setIncomeRecords] = useState<IncomeRecord[]>([]);
   const [totalExpenses, setTotalExpenses] = useState(0);
+  const [prevExpenses, setPrevExpenses] = useState<number | undefined>(undefined);
+  const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [byCategory, setByCategory] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -152,25 +203,34 @@ const Dashboard = () => {
 
     setLoading(true);
     setError(null);
+    setPrevExpenses(undefined);
 
     const db = getDatabase(app);
     const uid = currentUser.uid;
 
-    // Fetch income for every month that falls within the filter period.
+    // Fetch income records (with source info) for all months in the period.
     const incomePromise = Promise.all(
       getMonthsForFilter(filter).map((month) =>
         get(ref(db, `expenses/users/${uid}/income/${month}`)).then((snap) => {
-          let total = 0;
+          const records: IncomeRecord[] = [];
           if (snap.exists()) {
             snap.forEach((child) => {
-              const val = child.val() as { amount?: number; currency?: string };
-              if ((val.currency ?? "$") === "$") total += Number(val.amount ?? 0);
+              const val = child.val() as {
+                amount?: number;
+                currency?: string;
+                source?: string;
+              };
+              records.push({
+                source: val.source ?? "",
+                amount: Number(val.amount ?? 0),
+                currency: val.currency ?? "$",
+              });
             });
           }
-          return total;
+          return records;
         })
       )
-    ).then((totals) => totals.reduce((sum, t) => sum + t, 0));
+    ).then((groups) => groups.flat());
 
     // Fetch expenses using the same query patterns as the Expenses page.
     let expensePromise: Promise<Expense[]>;
@@ -245,7 +305,11 @@ const Dashboard = () => {
     }
 
     Promise.all([incomePromise, expensePromise])
-      .then(([income, expenses]) => {
+      .then(([records, expenses]) => {
+        const income = records
+          .filter((r) => r.currency === "$")
+          .reduce((sum, r) => sum + r.amount, 0);
+
         const active = expenses.filter((e) => e.active !== false);
         const spent = active
           .filter((e) => e.currency === "$")
@@ -258,9 +322,17 @@ const Dashboard = () => {
         }
 
         setTotalIncome(income);
+        setIncomeRecords(records);
         setTotalExpenses(spent);
+        setAllExpenses(expenses);
         setByCategory(catMap);
         setLoading(false);
+
+        // Fetch previous month total separately after main data is shown.
+        if (filter.mode === "monthly" && filter.month) {
+          const prev = shiftMonthBack(filter.month);
+          fetchMonthExpensesTotal(db, uid, prev).then(setPrevExpenses);
+        }
       })
       .catch((err) => {
         console.error("Dashboard fetch failed:", err);
@@ -271,6 +343,22 @@ const Dashboard = () => {
 
   const periodLabel = formatFilterLabel(filter);
   const hasData = totalIncome > 0 || totalExpenses > 0;
+
+  // Derive highlights from raw expense array.
+  const activeExpenses = allExpenses.filter(
+    (e) => e.active !== false && e.currency === "$"
+  );
+  const biggestExpense =
+    activeExpenses.length > 0
+      ? activeExpenses.reduce((max, e) =>
+          Number(e.amount) > Number(max.amount) ? e : max
+        )
+      : null;
+
+  const savingsRate =
+    totalIncome > 0
+      ? ((totalIncome - totalExpenses) / totalIncome) * 100
+      : null;
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -304,10 +392,35 @@ const Dashboard = () => {
             totalIncome={totalIncome}
             totalExpenses={totalExpenses}
             periodLabel={periodLabel}
+            prevExpenses={prevExpenses}
           />
 
           {hasData ? (
-            <CategoryBreakdown byCategory={byCategory} />
+            <>
+              <Highlights
+                savingsRate={savingsRate}
+                biggest={
+                  biggestExpense
+                    ? {
+                        name: biggestExpense.name,
+                        amount: Number(biggestExpense.amount),
+                        date: biggestExpense.date,
+                        category: biggestExpense.category,
+                      }
+                    : null
+                }
+              />
+
+              <CategoryBreakdown byCategory={byCategory} />
+
+              {filter.mode === "monthly" && filter.month && (
+                <DailyLineChart expenses={allExpenses} month={filter.month} />
+              )}
+
+              <IncomeBreakdown records={incomeRecords} />
+
+              <RecentExpenses expenses={allExpenses} />
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center text-muted-foreground">
               <p className="text-sm font-medium">No data for this period.</p>
