@@ -1,4 +1,5 @@
 import { getCategoryMeta } from "@/utils/CategoryConfig";
+import MaskedAmount from "@/components/MaskedAmount";
 
 interface Expense {
   id: string;
@@ -73,11 +74,13 @@ const RecentExpenses = ({ expenses }: RecentExpensesProps) => {
 
               {/* Amount */}
               <span className="shrink-0 text-sm font-semibold text-foreground">
-                {expense.currency}
-                {Number(expense.amount).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+                <MaskedAmount>
+                  {expense.currency}
+                  {Number(expense.amount).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </MaskedAmount>
               </span>
             </div>
           );

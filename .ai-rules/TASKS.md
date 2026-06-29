@@ -240,14 +240,14 @@ The AI must not reuse old code unless the human explicitly says so.
 ---
 
 ### TASK-015 - Monthly Income vs Expense View
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** A view showing each month's total income, total expense, and per-category breakdown side by side.
 **Steps:**
-- [ ] Agree on layout with human (table vs cards vs chart)
-- [ ] Query income and expense data per month from Firebase
-- [ ] Calculate and show: total income, total expense, money left per month
-- [ ] Show per-category expense breakdown per month
-- [ ] Handle months with no income or no expenses logged
+- [x] Agree on layout with human (table vs cards vs chart)
+- [x] Query income and expense data per month from Firebase
+- [x] Calculate and show: total income, total expense, money left per month
+- [x] Show per-category expense breakdown per month
+- [x] Handle months with no income or no expenses logged
 
 ---
 
@@ -267,15 +267,15 @@ The AI must not reuse old code unless the human explicitly says so.
 ## Phase 6 - Dashboard
 
 ### TASK-017 - Dashboard Page
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 **Description:** Build the main dashboard as a summary overview. Built after data features so there is real data to display.
 **Steps:**
-- [ ] Agree on dashboard layout and what to show with human
-- [ ] Show current month summary: total income, total expense, money left
-- [ ] Show spending breakdown by category (Nivo chart)
-- [ ] Show recent expenses (last 5-10)
-- [ ] Add quick-access add expense button
-- [ ] Handle empty state (new user with no data)
+- [x] Agree on dashboard layout and what to show with human
+- [x] Show current month summary: total income, total expense, money left
+- [x] Show spending breakdown by category (Nivo chart)
+- [x] Show recent expenses (last 5-10)
+- [x] Add quick-access add expense button
+- [x] Handle empty state (new user with no data)
 - [ ] Verify on mobile and desktop
 
 ---
@@ -312,6 +312,20 @@ The AI must not reuse old code unless the human explicitly says so.
 - [ ] Audit remaining Bootstrap usage after Phase 6 is complete
 - [ ] Migrate remaining components to Tailwind - one at a time with approval
 - [ ] Remove React Bootstrap from `package.json` once fully migrated
+
+---
+
+### TASK-022 - Number Mask Toggle
+**Status:** `DONE`
+**Description:** Add a privacy toggle to the app header. When masked (default), all currency amounts are blurred. When unmasked, amounts are visible. Preference is saved per user in Firebase.
+**Firebase path:** `/expenses/users/{uid}/preferences/maskAmounts`
+**Steps:**
+- [x] Create `src/context/MaskContext.tsx` — masked state, toggleMask, read/write Firebase preference
+- [x] Wrap app with `MaskProvider` in `src/main.tsx`
+- [x] Add Eye/EyeOff button to AppShell header next to dark mode toggle
+- [x] Create `src/components/MaskedAmount.tsx` — wraps any amount, applies `blur-sm select-none` when masked
+- [x] Replace all currency amount displays across all pages with `MaskedAmount`
+- [ ] Verify masking works on Dashboard, Expenses, Income, and Category views
 
 ---
 

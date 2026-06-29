@@ -1,4 +1,5 @@
 import { TrendingUp } from "lucide-react";
+import MaskedAmount from "@/components/MaskedAmount";
 
 export interface IncomeRecord {
   source: string;
@@ -38,10 +39,12 @@ const IncomeBreakdown = ({ records }: IncomeBreakdownProps) => {
             </p>
 
             <span className="shrink-0 text-sm font-semibold text-emerald-600">
-              ${record.amount.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+              <MaskedAmount>
+                ${record.amount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </MaskedAmount>
             </span>
           </div>
         ))}

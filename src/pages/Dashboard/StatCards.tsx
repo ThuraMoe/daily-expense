@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import MaskedAmount from "@/components/MaskedAmount";
 
 interface StatCardsProps {
   totalIncome: number;
@@ -43,7 +44,7 @@ const StatCards = ({
           </p>
         </div>
         <p className="mt-2 text-2xl font-bold text-emerald-600">
-          {totalIncome > 0 ? `$${fmt(totalIncome)}` : "–"}
+          <MaskedAmount>{totalIncome > 0 ? `$${fmt(totalIncome)}` : "–"}</MaskedAmount>
         </p>
         <p className="mt-0.5 text-[10px] text-emerald-600/60">{periodLabel}</p>
       </div>
@@ -57,7 +58,7 @@ const StatCards = ({
           </p>
         </div>
         <p className="mt-2 text-2xl font-bold text-primary">
-          {totalExpenses > 0 ? `$${fmt(totalExpenses)}` : "–"}
+          <MaskedAmount>{totalExpenses > 0 ? `$${fmt(totalExpenses)}` : "–"}</MaskedAmount>
         </p>
         {delta !== null ? (
           <p
@@ -69,7 +70,9 @@ const StatCards = ({
                 : "text-muted-foreground"
             }`}
           >
-            {delta > 0 ? `$${fmt(delta)} more than last month` : delta < 0 ? `$${fmt(Math.abs(delta))} less than last month` : "Same as last month"}
+            <MaskedAmount>
+              {delta > 0 ? `$${fmt(delta)} more than last month` : delta < 0 ? `$${fmt(Math.abs(delta))} less than last month` : "Same as last month"}
+            </MaskedAmount>
           </p>
         ) : (
           <p className="mt-0.5 text-[10px] text-primary/60">{periodLabel}</p>
@@ -99,9 +102,11 @@ const StatCards = ({
             leftPositive ? "text-emerald-600" : "text-destructive"
           }`}
         >
-          {totalIncome > 0 || totalExpenses > 0
-            ? `${leftPositive ? "" : "-"}$${fmt(Math.abs(moneyLeft))}`
-            : "–"}
+          <MaskedAmount>
+            {totalIncome > 0 || totalExpenses > 0
+              ? `${leftPositive ? "" : "-"}$${fmt(Math.abs(moneyLeft))}`
+              : "–"}
+          </MaskedAmount>
         </p>
         <p
           className={`mt-0.5 text-[10px] ${

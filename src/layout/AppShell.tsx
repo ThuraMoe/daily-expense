@@ -3,6 +3,8 @@ import {
   BarChart3,
   ChevronRight,
   CreditCard,
+  Eye,
+  EyeOff,
   LayoutDashboard,
   LogOut,
   Moon,
@@ -20,6 +22,7 @@ import { NavLink, Outlet } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useMask } from "@/context/MaskContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import AddExpenseModal from "@/components/AddExpenseModal";
@@ -66,6 +69,7 @@ const quickActions = [
 const AppShell = () => {
   const { currentUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { masked, toggleMask } = useMask();
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [incomeModalOpen, setIncomeModalOpen] = useState(false);
   const userLabel =
@@ -201,6 +205,15 @@ const AppShell = () => {
         <header className="flex h-16 shrink-0 items-center gap-2 px-4 md:px-12">
           <SidebarTrigger className="-ml-1" />
           <div className="ml-auto flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="rounded-xl px-2"
+              onClick={toggleMask}
+              title={masked ? "Show amounts" : "Hide amounts"}
+            >
+              {masked ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
             <Button
               size="sm"
               variant="ghost"

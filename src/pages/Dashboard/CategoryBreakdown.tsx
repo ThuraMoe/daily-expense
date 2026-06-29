@@ -1,4 +1,5 @@
 import { getCategoryMeta } from "@/utils/CategoryConfig";
+import MaskedAmount from "@/components/MaskedAmount";
 
 interface CategoryBreakdownProps {
   byCategory: Record<string, number>;
@@ -34,7 +35,7 @@ const CategoryBreakdown = ({ byCategory }: CategoryBreakdownProps) => {
             >
               <Icon size={12} />
               <span>{cat}</span>
-              <span className="font-semibold">${fmt(amount)}</span>
+              <MaskedAmount className="font-semibold">${fmt(amount)}</MaskedAmount>
             </div>
           );
         })}

@@ -4,12 +4,15 @@ import './index.css'
 import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { MaskProvider } from './context/MaskContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <App />
+        <MaskProvider>
+          <App />
+        </MaskProvider>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,

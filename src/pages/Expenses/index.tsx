@@ -19,6 +19,7 @@ import { useAuth } from "@/context/AuthContext";
 import { app } from "@/firebaseConfig";
 import { getCategoryMeta } from "@/utils/CategoryConfig";
 import AddExpenseModal from "@/components/AddExpenseModal";
+import MaskedAmount from "@/components/MaskedAmount";
 import DateFilterPopover, {
   type DateFilter,
   formatFilterLabel,
@@ -255,7 +256,7 @@ const ExpenseCard = ({ expense, togglingId, onToggle, onEdit, onDelete }: Expens
       {/* Amount + action buttons */}
       <div className="flex shrink-0 items-center gap-1">
         <span className="mr-1 text-sm font-semibold text-card-foreground">
-          {expense.currency}{Number(expense.amount).toFixed(2)}
+          <MaskedAmount>{expense.currency}{Number(expense.amount).toFixed(2)}</MaskedAmount>
         </span>
         <button
           aria-label={expense.active === false ? "Mark active" : "Mark inactive"}
@@ -644,7 +645,7 @@ const Expenses = () => {
               Total Spent
             </p>
             <p className="mt-1 text-xl font-bold text-primary">
-              {stats.totalSpent > 0 ? `$${stats.totalSpent.toLocaleString()}` : "–"}
+              <MaskedAmount>{stats.totalSpent > 0 ? `$${stats.totalSpent.toLocaleString()}` : "–"}</MaskedAmount>
             </p>
             <p className="mt-0.5 text-[10px] text-primary/60">{periodLabel}</p>
           </div>
@@ -657,9 +658,11 @@ const Expenses = () => {
               {stats.mostSpentCategory ?? "–"}
             </p>
             <p className="mt-0.5 text-[10px] text-muted-foreground">
-              {stats.mostSpentCategory
-                ? `$${(stats.byCategory[stats.mostSpentCategory] ?? 0).toLocaleString()}`
-                : "no data"}
+              <MaskedAmount>
+                {stats.mostSpentCategory
+                  ? `$${(stats.byCategory[stats.mostSpentCategory] ?? 0).toLocaleString()}`
+                  : "no data"}
+              </MaskedAmount>
             </p>
           </div>
 
@@ -668,7 +671,7 @@ const Expenses = () => {
               Avg / Day
             </p>
             <p className="mt-1 text-xl font-bold text-foreground">
-              {stats.avgPerDay > 0 ? `$${stats.avgPerDay.toFixed(2)}` : "–"}
+              <MaskedAmount>{stats.avgPerDay > 0 ? `$${stats.avgPerDay.toFixed(2)}` : "–"}</MaskedAmount>
             </p>
             <p className="mt-0.5 text-[10px] text-muted-foreground">estimated</p>
           </div>
@@ -697,9 +700,11 @@ const Expenses = () => {
                     >
                       <Icon size={12} style={{ color: isActive ? color : undefined }} />
                       <span>{cat}</span>
-                      <span className="font-semibold" style={{ color: isActive ? color : "var(--foreground)" }}>
-                        ${amount.toLocaleString()}
-                      </span>
+                      <MaskedAmount>
+                        <span className="font-semibold" style={{ color: isActive ? color : "var(--foreground)" }}>
+                          ${amount.toLocaleString()}
+                        </span>
+                      </MaskedAmount>
                     </button>
                   );
                 })}
@@ -742,7 +747,7 @@ const Expenses = () => {
                     : formatDate(dailyDisplayDate)}
                 </h2>
                 <span className="text-sm font-bold text-foreground">
-                  {stats.totalSpent > 0 ? `$${stats.totalSpent.toLocaleString()}` : "–"}
+                  <MaskedAmount>{stats.totalSpent > 0 ? `$${stats.totalSpent.toLocaleString()}` : "–"}</MaskedAmount>
                 </span>
               </div>
               <div className="flex flex-col gap-2">
@@ -773,7 +778,7 @@ const Expenses = () => {
                   <div className="mb-2 flex items-center justify-between">
                     <h2 className="text-sm font-semibold text-foreground">{label}</h2>
                     <span className="text-sm font-bold text-foreground">
-                      {groupTotal > 0 ? `$${groupTotal.toLocaleString()}` : "–"}
+                      <MaskedAmount>{groupTotal > 0 ? `$${groupTotal.toLocaleString()}` : "–"}</MaskedAmount>
                     </span>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -812,7 +817,7 @@ const Expenses = () => {
                     <span className="text-sm font-bold text-foreground">{label}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-foreground">
-                        {total > 0 ? `$${total.toLocaleString()}` : "–"}
+                        <MaskedAmount>{total > 0 ? `$${total.toLocaleString()}` : "–"}</MaskedAmount>
                       </span>
                       <ChevronDown
                         size={15}
@@ -844,7 +849,7 @@ const Expenses = () => {
                                     {dayLabel}
                                   </h2>
                                   <span className="text-sm font-bold text-foreground">
-                                    {dayTotal > 0 ? `$${dayTotal.toLocaleString()}` : "–"}
+                                    <MaskedAmount>{dayTotal > 0 ? `$${dayTotal.toLocaleString()}` : "–"}</MaskedAmount>
                                   </span>
                                 </div>
                                 <div className="flex flex-col gap-2">

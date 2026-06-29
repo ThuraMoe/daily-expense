@@ -6,6 +6,7 @@ import { Pencil, Trash2, TrendingUp } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { app } from "@/firebaseConfig";
 import AddIncomeModal from "@/components/AddIncomeModal";
+import MaskedAmount from "@/components/MaskedAmount";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -243,11 +244,13 @@ const Income = () => {
                     key={currency}
                     className="rounded-xl bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600"
                   >
-                    {currency}
-                    {total.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                    <MaskedAmount>
+                      {currency}
+                      {total.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </MaskedAmount>
                   </span>
                 ))}
               </div>
@@ -278,11 +281,13 @@ const Income = () => {
 
                   {/* Amount */}
                   <span className="shrink-0 text-sm font-semibold text-emerald-600">
-                    {item.currency}
-                    {item.amount.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                    <MaskedAmount>
+                      {item.currency}
+                      {item.amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </MaskedAmount>
                   </span>
 
                   {/* Actions */}
